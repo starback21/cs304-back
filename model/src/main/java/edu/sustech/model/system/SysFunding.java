@@ -21,5 +21,8 @@ public class SysFunding extends BaseEntity {
     @ApiModelProperty(value = "剩余金额")
     @TableField("remain_amount ")
     private Long remainAmount;
-      
+
+    public Integer getGroupId() {
+        return this.groupId;
+    }
 }
