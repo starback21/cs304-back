@@ -17,9 +17,9 @@ public class SysUser extends BaseEntity {
 	
 	private static final long serialVersionUID = 1L;
 
-	@ApiModelProperty(value = "用户名")
-	@TableField("username")
-	private String username;
+	@ApiModelProperty(value = "uid")
+	@TableField("uid")
+	private Long uid;
 
 	@ApiModelProperty(value = "密码")
 	@TableField("password")
@@ -38,8 +38,8 @@ public class SysUser extends BaseEntity {
 	private String headUrl;
 
 	@ApiModelProperty(value = "邮箱")
-	@TableField("mail")
-	private String mail;
+	@TableField("email")
+	private String email;
 
 	@ApiModelProperty(value = "描述")
 	@TableField("description")
