@@ -13,6 +13,7 @@ import java.util.List;
 
 @Api(tags = "角色管理接口")
 @RestController
+@CrossOrigin
 @RequestMapping("/admin/system/sysRole")
 public class SysRoleController {
 

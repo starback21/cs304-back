@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,7 +38,16 @@ public class SysGroupController {
         List<SysGroup> roleList = sysGroupService.list();
         return Result.ok(roleList);
     }
-
+    @ApiOperation("查询所有课题组名字")
+    @GetMapping("/getAllGroupName")
+    public Result<List<String>> getAllGroupName() {
+        List<SysGroup> roleList = sysGroupService.list();
+        List<String> nameList = new ArrayList<>();
+        for (SysGroup sysGroup : roleList) {
+            nameList.add(sysGroup.getGroupName());
+        }
+        return Result.ok(nameList);
+    }
     @ApiOperation(value = "根据id查询")
     @GetMapping("/get/{id}")
     public Result get(@PathVariable Long id) {

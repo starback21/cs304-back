@@ -1,6 +1,7 @@
 package edu.sustech.auth.controller;
 
 
+import edu.sustech.auth.service.SysGroupService;
 import edu.sustech.auth.service.SysUserService;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.SysUser;
@@ -8,6 +9,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Api(tags = "用户管理接口")
 @RestController
+@CrossOrigin
 @RequestMapping("/admin/system/sysUser")
 public class SysUserController {
 
@@ -34,12 +39,25 @@ public class SysUserController {
         }
         return Result.ok(user);
     }
-
+    @ApiOperation("查询所有用户名字")
+    @GetMapping("/getAllAccountName")
+    public Result<List<String>> getAllAccountName() {
+        List<String> nameList = new ArrayList<>();
+        List<SysUser> userList = service.list();
+        for (SysUser sysUser : userList){
+            nameList.add(sysUser.getName());
+        }
+        return Result.ok(nameList);
+    }
     @ApiOperation(value = "添加用户")
     @PostMapping("/createAccount")
     public Result save(@RequestBody SysUser user) {
-        service.save(user);
-        return Result.ok();
+        boolean is_success = service.save(user);
+        if (is_success) {
+            return Result.ok();
+        } else {
+            return Result.fail();
+        }
     }
 
     @ApiOperation(value = "更新用户")
@@ -54,6 +72,16 @@ public class SysUserController {
     public Result remove(@PathVariable Long id) {
         service.removeById(id);
         return Result.ok();
+    }
+    @ApiOperation(value = "根据id列表删除")
+    @DeleteMapping("/batchRemove")
+    public Result batchRemove(@RequestBody List<Long> idList) {
+        boolean is_success = service.removeByIds(idList);
+        if (is_success){
+            return Result.ok();
+        }else {
+            return Result.fail();
+        }
     }
 }
 
