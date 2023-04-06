@@ -62,7 +62,7 @@ CREATE TABLE `sys_user_role` (
 drop table if exists sys_funding;
 CREATE TABLE sys_funding (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  group_id VARCHAR(255) NOT NULL,
+  group_id INT NOT NULL,
   total_amount DECIMAL(10, 2) NOT NULL,
   remain_amount DECIMAL(10, 2) NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

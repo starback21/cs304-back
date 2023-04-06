@@ -3,6 +3,7 @@ package edu.sustech.auth.controller;
 import edu.sustech.auth.service.SysFundingService;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.SysFunding;
+import edu.sustech.model.system.SysGroup;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +39,13 @@ public class SysFundingController {
 
     @ApiOperation(value = "更新经费")
     @PostMapping("update")
-    public Result update(@RequestBody @Validated SysFunding sysFunding){
-        sysFundingService.updateById(sysFunding);
-        return Result.ok();
+    public Result updateById(@RequestBody SysFunding funding) {
+        boolean is_success = sysFundingService.updateById(funding);
+        if (is_success){
+            return Result.ok();
+        }else {
+            return Result.fail();
+        }
     }
 
     @ApiOperation(value = "删除经费")
@@ -51,20 +56,22 @@ public class SysFundingController {
     }
     @ApiOperation(value = "根据组名获取经费信息")
     @GetMapping ("find/{groupId}")
-    public Result getFundInfoByGroup(String groupId) {
+    public Result getFundInfoByGroup(@PathVariable String groupId) {
         List<SysFunding> foudingList = sysFundingService.list();
         List<SysFunding> result = new ArrayList<>();
+        System.out.println(groupId);
         for (SysFunding sysFunding : foudingList) {
             System.out.println(sysFunding.getGroupId());
             if (Objects.equals(sysFunding.getGroupId().toString(), groupId)) {
                 result.add(sysFunding);
+                System.out.println("test");
             }
         }
         return Result.ok(result);
     }
     @ApiOperation(value = "根据经费获取组名")
     @GetMapping ("findGroup/{fundingId}")
-    public Result getGroupInfoByFunding(Integer fundingId) {
+    public Result getGroupInfoByFunding(@PathVariable Integer fundingId) {
         List<SysFunding> foudingList = sysFundingService.list();
         Integer result = 1;
         for (SysFunding sysFunding : foudingList) {
