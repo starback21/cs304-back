@@ -5,6 +5,9 @@ import edu.sustech.model.base.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.sql.Time;
+
 @Data
 @ApiModel(description = "经费表")
 @TableName("sys_funding")
@@ -36,9 +39,10 @@ public class SysFunding extends BaseEntity {
     @ApiModelProperty(value = "经费状态")
     @TableField("status")
     private String status;
-    @ApiModelProperty(value = "leftDay")
-    @TableField("left_day")
-    private Long leftDay;
-
-
+    @ApiModelProperty(value = "开始时间")
+    @TableField("start_time")
+    private String startTime;
+    @ApiModelProperty(value = "结束时间")
+    @TableField("end_time")
+    private String endTime;
 }

@@ -61,16 +61,17 @@ CREATE TABLE `sys_user_role` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='用户角色';
 drop table if exists sys_funding;
 CREATE TABLE sys_funding (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  funding_id INT NOT NULL,
-  funding_name VARCHAR(20) NOT NULL,
-  group_id INT NOT NULL,
-  group_name VARCHAR(20) NOT NULL,
-  total_amount DECIMAL(10, 2) NOT NULL,
-  cost DECIMAL(10, 2) NOT NULL,
-  remain_amount DECIMAL(10, 2) NOT NULL,
-  status  VARCHAR(20) NOT NULL DEFAULT 'COMPLETED',
-  left_day LONG NOT NULL,
+  id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键id',
+  funding_id INT NOT NULL COMMENT '经费id',
+  funding_name VARCHAR(20) NOT NULL COMMENT '经费名称',
+  group_id INT NOT NULL COMMENT '课题组id',
+  group_name VARCHAR(20) NOT NULL COMMENT '课题组名称',
+  total_amount DECIMAL(10, 2) NOT NULL COMMENT '总经费',
+  cost DECIMAL(10, 2) NOT NULL COMMENT '单次花费',
+  remain_amount DECIMAL(10, 2) NOT NULL COMMENT '剩余经费',
+  status  VARCHAR(20) NOT NULL DEFAULT 'COMPLETED' COMMENT '状态',
+  `start_time` VARCHAR(20) NOT NULL COMMENT '开始时间',
+   end_time VARCHAR(20) NOT NULL COMMENT '结束时间',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:不可用 1:可用）    '

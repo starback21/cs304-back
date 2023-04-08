@@ -38,7 +38,7 @@ public class SysFundingController {
                     map.put("left", f.getRemainAmount());
                     map.put("percent",(f.getRemainAmount()*100/f.getTotalAmount()));
                     map.put("state", f.getStatus());
-                    map.put("leftDay", f.getLeftDay());
+                    map.put("leftDay",System.currentTimeMillis());
                     map.put("disabled", f.getIsDeleted());
                     return map;
                 })
