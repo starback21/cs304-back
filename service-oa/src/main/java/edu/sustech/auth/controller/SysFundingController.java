@@ -23,9 +23,26 @@ public class SysFundingController {
     private SysFundingService sysFundingService;
 
     @ApiOperation(value = "获取所有经费")
-    @GetMapping("findAll")
+    @GetMapping("getFunds")
     public Result getAll(){
         List<SysFunding> list = sysFundingService.list();
+        List<Map<String, Object>> result = list.stream()
+                .map(f -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("key", f.getId());
+                    map.put("id", f.getFundingId());
+                    map.put("name", f.getFundingName());
+                    map.put("group", f.getGroupName());
+                    map.put("total", f.getTotalAmount());
+                    map.put("cost", f.getCost());
+                    map.put("left", f.getRemainAmount());
+                    map.put("percent",(f.getRemainAmount()*100/f.getTotalAmount()));
+                    map.put("state", f.getStatus());
+                    map.put("leftDay", f.getLeftDay());
+                    map.put("disabled", f.getIsDeleted());
+                    return map;
+                })
+                .collect(Collectors.toList());
         return Result.ok(list);
     }
     @ApiOperation(value = "根据经费id获取组")
@@ -68,7 +85,9 @@ public class SysFundingController {
     @ApiOperation(value = "删除经费")
     @DeleteMapping("delete/{id}")
     public Result delete(@PathVariable String id){
-        sysFundingService.removeById(id);
+        SysFunding sysFunding = sysFundingService.getById(id);
+        sysFunding.setIsDeleted(1);
+        sysFundingService.updateById(sysFunding);
         return Result.ok();
     }
 
@@ -109,7 +128,9 @@ public class SysFundingController {
                     map.put("cost", f.getCost());
                     map.put("left", f.getRemainAmount());
                     map.put("percent",(f.getRemainAmount()*100/f.getTotalAmount()));
-                    sysFundingService.removeById(f.getId());
+                    SysFunding sysFunding = sysFundingService.getById(f.getId());
+                    sysFunding.setIsDeleted(1);
+                    sysFundingService.updateById(sysFunding);
                     return map;
                 })
                 .collect(Collectors.toList());
@@ -117,7 +138,7 @@ public class SysFundingController {
     }
 
     @ApiOperation(value = "根据组名获取经费信息")
-    @GetMapping ("find/{groupId}")
+    @GetMapping ("getFundInfoByGroup")
     public Result getFundInfoByGroup(@PathVariable String groupId) {
         List<SysFunding> foudingList = sysFundingService.list();
         List<Map<String, Object>> result = foudingList.stream()
@@ -149,4 +170,24 @@ public class SysFundingController {
         }
         return Result.ok(result);
     }
+    @ApiOperation(value = "根据组添加经费")
+    @GetMapping ("addGroupsToFund")
+    public Result addGroupsToFund(@RequestParam List groups, @RequestParam Long fundId){
+        List<SysFunding> foudingList = sysFundingService.list();
+        List<Map<String, Object>> result = foudingList.stream()
+                .filter(f -> Objects.equals(f.getFundingId(), fundId))
+                .map(f -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("Complete", f.getStatus());
+                    map.put("group", f.getGroupName());
+                    map.put("total", f.getTotalAmount());
+                    map.put("cost", f.getCost());
+                    map.put("left", f.getRemainAmount());
+                    map.put("percent",(f.getRemainAmount()*100/f.getTotalAmount()));
+                    return map;
+                })
+                .collect(Collectors.toList());
+        return Result.ok(result);
+    }
+
 }

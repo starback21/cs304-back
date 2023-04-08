@@ -36,5 +36,9 @@ public class SysFunding extends BaseEntity {
     @ApiModelProperty(value = "经费状态")
     @TableField("status")
     private String status;
+    @ApiModelProperty(value = "leftDay")
+    @TableField("left_day")
+    private Long leftDay;
+
 
 }
