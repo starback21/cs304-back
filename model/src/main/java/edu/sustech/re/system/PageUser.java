@@ -1,5 +1,6 @@
 package edu.sustech.re.system;
 
+import javafx.beans.binding.LongExpression;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class PageUser {
     //uid
     Long key;
+    Long id;
     //user_name
     String name;
     //group_id

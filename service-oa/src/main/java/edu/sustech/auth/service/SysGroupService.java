@@ -13,5 +13,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2023-04-04
  */
 public interface SysGroupService extends IService<SysGroup> {
+    boolean addGroupUsers(Long groupId, Long userId);
 
+    boolean deleteGroupUser(Long groupId, Long userId);
+
+    boolean getUsersNotInGroup(Long groupId);
 }

@@ -1,8 +1,11 @@
 package edu.sustech.auth.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import edu.sustech.auth.service.SysRoleService;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.SysRole;
+import edu.sustech.model.system.SysUserRole;
+import edu.sustech.vo.system.AssginRoleVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Api(tags = "角色管理接口")
 @RestController
@@ -20,6 +24,23 @@ public class SysRoleController {
     //注入service
     @Autowired
     private SysRoleService sysRoleService;
+
+    @ApiOperation(value = "根据用户获取角色数据")
+    @GetMapping("/toAssign/{userId}")
+    public Result toAssign(@PathVariable Long userId) {
+        Map<Long, Long> roleMap = sysRoleService.findRoleByAdminId(userId);
+        return Result.ok(roleMap);
+    }
+
+    @ApiOperation(value = "更改用户权限")
+    @PostMapping("/changeAdmin")
+    public Result changeAdmin(@RequestParam(value = "group_id") Long groupId,
+                           @RequestParam(value = "user_id") Long userId) {
+        if (sysRoleService.doAssign(groupId,userId))
+            return Result.ok();
+        else
+            return Result.fail();
+    }
 
     @ApiOperation("查询所有角色")
     @GetMapping("/findAll")

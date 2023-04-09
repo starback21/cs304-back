@@ -1,9 +1,15 @@
 package edu.sustech.model.system;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
-import java.io.Serializable;
+
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import edu.sustech.model.base.BaseEntity;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,46 +22,22 @@ import lombok.EqualsAndHashCode;
  * @since 2023-04-04
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class SysGroup implements Serializable {
+@ApiModel(description = "课题组")
+@TableName("sys_group")
+public class SysGroup extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 课题组id
-     */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
-
-    /**
-     * 课题组名称
-     */
+    @ApiModelProperty(value = "组名")
+    @TableField("group_name")
     private String groupName;
 
-    /**
-     * 课题组编码
-     */
+    @ApiModelProperty(value = "课题组编码")
+    @TableField("group_code")
     private String groupCode;
 
-    /**
-     * 描述
-     */
+    @ApiModelProperty(value = "描述")
+    @TableField("description")
     private String description;
-
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
-
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updateTime;
-
-    /**
-     * 删除标记（0:不可用 1:可用）
-     */
-    private Integer isDeleted;
-
 
 }

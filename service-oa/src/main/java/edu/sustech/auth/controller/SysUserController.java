@@ -1,6 +1,10 @@
 package edu.sustech.auth.controller;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import edu.sustech.auth.service.SysUserService;
 import edu.sustech.re.system.PageUser;
 import edu.sustech.common.result.Result;
@@ -27,7 +31,7 @@ import java.util.Map;
  */
 @Api(tags = "用户管理接口")
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping("/admin/system/sysUser")
 public class SysUserController {
 
@@ -127,9 +131,15 @@ public class SysUserController {
         return Result.ok();
     }
     @ApiOperation(value = "根据id列表删除")
-    @DeleteMapping("/batchRemove")
-    public Result batchRemove(@RequestBody List<Long> idList) {
-        boolean is_success = service.removeByIds(idList);
+//    @DeleteMapping("/batchRemove")
+    @PostMapping("/batchRemove")
+    public Result batchRemove(@RequestBody JSONObject jsonParam) {
+        JSONArray data = jsonParam.getJSONArray("idList");
+        String js = JSONObject.toJSONString(data, SerializerFeature.WriteClassName);
+        List<Long> idList = JSONObject.parseArray(js, Long.class);
+        QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
+        wrapper.in("uid",idList);
+        boolean is_success = service.remove(wrapper);
         if (is_success){
             return Result.ok();
         }else {

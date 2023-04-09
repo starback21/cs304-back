@@ -2,12 +2,16 @@ package edu.sustech.auth.controller;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import edu.sustech.auth.service.SysGroupService;
 
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.SysGroup;
 
+
+import edu.sustech.model.system.SysUser;
 import edu.sustech.re.system.PageGroup;
+import edu.sustech.re.system.PageUser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +32,7 @@ import java.util.Map;
  */
 @Api(tags = "课题组管理接口")
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping("/admin/system/sysGroup")
 public class SysGroupController {
 
@@ -124,9 +128,10 @@ public class SysGroupController {
         }
     }
 
-    @ApiOperation(value = "删除课题组")
-    @DeleteMapping("/remove")
-    public Result remove(@RequestParam Long id) {
+    @ApiOperation(value = "移除课题组")
+    @PostMapping("/remove")
+    public Result remove(@RequestBody JSONObject jsonParam) {
+        Long id = jsonParam.getLong("id");
         boolean is_success = sysGroupService.removeById(id);
         if (is_success){
             return Result.ok();
@@ -145,6 +150,32 @@ public class SysGroupController {
             return Result.fail();
         }
     }
+    @ApiOperation(value = "添加用户到课题组")
+    @PostMapping("addGroupUsers")
+    public Result addGroupUsers(@RequestParam(value = "group_id") Long groupId,
+                                @RequestParam(value = "user_id") Long userId){
+        if (sysGroupService.addGroupUsers(groupId,userId))
+            return Result.ok();
+        else
+            return Result.fail();
+    }
+    @ApiOperation(value = "删除组内用户")
+    @PostMapping("deleteGroupUser")
+    public Result deleteGroupUser(@RequestParam(value = "group_id") Long groupId,
+                                  @RequestParam(value = "user_id") Long userId){
+        if (sysGroupService.deleteGroupUser(groupId,userId))
+            return Result.ok();
+        else
+            return Result.fail();
+    }
 
+    @ApiOperation(value = "删除组内用户")
+    @PostMapping("getUsersNotInGroup")
+    public Result<List<PageUser>> getUsersNotInGroup(@RequestParam(value = "group_id") Long groupId){
+        if (sysGroupService.getUsersNotInGroup(groupId))
+            return Result.ok();
+        else
+            return Result.fail();
+    }
 }
 

@@ -1,9 +1,11 @@
 package edu.sustech.auth.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import edu.sustech.model.system.SysUser;
 import edu.sustech.auth.mapper.SysUserMapper;
 import edu.sustech.auth.service.SysUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
