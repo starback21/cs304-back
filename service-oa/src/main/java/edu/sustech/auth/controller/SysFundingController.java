@@ -1,6 +1,7 @@
 package edu.sustech.auth.controller;
 
 import edu.sustech.auth.service.SysFundingService;
+import edu.sustech.auth.service.SysGroupService;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.SysFunding;
 import edu.sustech.model.system.SysGroup;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 public class SysFundingController {
     @Autowired
     private SysFundingService sysFundingService;
+    @Autowired
+    private SysGroupService sysGroupService;
 
     @ApiOperation(value = "获取所有经费")
     @GetMapping("getFunds")
@@ -97,7 +100,7 @@ public class SysFundingController {
 
         List<SysFunding> foudingList = sysFundingService.list();
         List<Map<String, Object>> deletedFundingList = foudingList.stream()
-                .filter(f -> Objects.equals(f.getGroupId(), groupId) && Objects.equals(f.getFundingId(), fundingId) && f.getStatus().equals("COMPLETE"))
+                .filter(f -> Objects.equals(f.getGroupId(), groupId) && Objects.equals(f.getFundingId(), fundingId) && f.getCost()==0)
                 .map(f -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("Complete", f.getStatus());
@@ -119,7 +122,7 @@ public class SysFundingController {
 
         List<SysFunding> foudingList = sysFundingService.list();
         List<Map<String, Object>> deletedFundingList = foudingList.stream()
-                .filter(f -> Objects.equals(f.getGroupName(), groupName) && Objects.equals(f.getFundingId(), fundingId) && f.getStatus().equals("COMPLETE"))
+                .filter(f -> Objects.equals(f.getGroupName(), groupName) && Objects.equals(f.getFundingId(), fundingId) && f.getCost()==0)
                 .map(f -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("Complete", f.getStatus());
@@ -139,7 +142,7 @@ public class SysFundingController {
 
     @ApiOperation(value = "根据组名获取经费信息")
     @GetMapping ("getFundInfoByGroup")
-    public Result getFundInfoByGroup(@PathVariable String groupId) {
+    public Result getFundInfoByGroup(@RequestParam String groupId) {
         List<SysFunding> foudingList = sysFundingService.list();
         List<Map<String, Object>> result = foudingList.stream()
                 .filter(f -> Objects.equals(f.getGroupId().toString(), groupId))
@@ -159,7 +162,7 @@ public class SysFundingController {
     }
     @ApiOperation(value = "根据经费获取组名")
     @GetMapping ("findGroup/{fundingId}")
-    public Result getGroupInfoByFunding(@PathVariable Integer fundingId) {
+    public Result getGroupInfoByFunding(@PathVariable Long fundingId) {
         List<SysFunding> foudingList = sysFundingService.list();
         Integer result = 1;
         for (SysFunding sysFunding : foudingList) {
@@ -172,22 +175,82 @@ public class SysFundingController {
     }
     @ApiOperation(value = "根据组添加经费")
     @GetMapping ("addGroupsToFund")
-    public Result addGroupsToFund(@RequestParam List groups, @RequestParam Long fundId){
+    public Result addGroupsToFund(@RequestParam String fundId,@RequestParam List<String>groups){
+        SysFunding tem=null;
+        List<SysFunding> foudingList = sysFundingService.list();
+        List<SysGroup> groupList = sysGroupService.list();
+        List<Map<String, Object>>result=new ArrayList<>();
+        SysFunding sysFunding = foudingList.stream()
+                .filter(f -> Objects.equals(f.getFundingId(),Long.parseLong(fundId)))
+                .findFirst()
+                .orElse(null);
+        if (sysFunding == null) {
+            return Result.fail("经费不存在");
+        }
+        for (String group : groups) {
+            tem = new SysFunding();
+            tem.setFundingId(Long.parseLong(fundId));
+            tem.setFundingName(sysFunding.getFundingName());
+            tem.setGroupId(Long.parseLong(group));
+            tem.setGroupName(sysGroupService.getById(Long.parseLong(group)).getGroupName());
+            tem.setTotalAmount(sysFunding.getTotalAmount());
+            tem.setRemainAmount(sysFunding.getRemainAmount());
+            tem.setCost(0L);
+            tem.setStatus(sysFunding.getStatus());
+            tem.setEndTime(sysFunding.getEndTime());
+            tem.setStartTime(sysFunding.getStartTime());
+            Map<String, Object> map = new HashMap<>();
+            map.put("Complete", tem.getStatus());
+            map.put("group", tem.getGroupName());
+            map.put("total", tem.getTotalAmount());
+            map.put("cost", tem.getCost());
+            map.put("left", tem.getRemainAmount());
+            map.put("percent",(tem.getRemainAmount()*100/tem.getTotalAmount()));
+            result.add(map);
+            sysFundingService.save(tem);
+        }
+        return Result.ok(result);
+    }
+    @ApiOperation(value = "根据经费id和组id获取经费详情")
+    @GetMapping ("getFundInfoByGroupAndFund")
+    public Result getFundInfoByGroupAndFund(@RequestParam String groupId,@RequestParam String fundingId) {
         List<SysFunding> foudingList = sysFundingService.list();
         List<Map<String, Object>> result = foudingList.stream()
-                .filter(f -> Objects.equals(f.getFundingId(), fundId))
+                .filter(f -> Objects.equals(f.getGroupId().toString(), groupId)&&Objects.equals(f.getFundingId().toString(), fundingId))
                 .map(f -> {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("Complete", f.getStatus());
-                    map.put("group", f.getGroupName());
+                    map.put("category1", f.getCategory1());
+                    map.put("category2", f.getCategory2());
+                    map.put("fundName", f.getFundingName());
                     map.put("total", f.getTotalAmount());
                     map.put("cost", f.getCost());
                     map.put("left", f.getRemainAmount());
-                    map.put("percent",(f.getRemainAmount()*100/f.getTotalAmount()));
+                    map.put("new","False");
                     return map;
                 })
                 .collect(Collectors.toList());
         return Result.ok(result);
     }
+    @ApiOperation(value = "根据经费id和组id修改经费详情")
+    @PostMapping ("modifyGroupFundDetail")
+    public Result modifyGroupFundDetail(@RequestBody List<Map<String, Object>> fundDetail) {
+        List<SysFunding> foudingList = sysFundingService.list();
+        List<Map<String, Object>> result = foudingList.stream()
+                .filter(f -> Objects.equals(f.getGroupId().toString(), fundDetail.get(0).get("groupId").toString())&&Objects.equals(f.getFundingId().toString(), fundDetail.get(0).get("fundingId").toString()))
+                .map(f -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("category1", f.getCategory1());
+                    map.put("category2", f.getCategory2());
+                    map.put("fundName", f.getFundingName());
+                    map.put("total", f.getTotalAmount());
+                    map.put("cost", f.getCost());
+                    map.put("left", f.getRemainAmount());
+                    map.put("new","False");
+                    return map;
+                })
+                .collect(Collectors.toList());
+        return Result.ok(result);
+    }
+
 
 }

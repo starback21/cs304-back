@@ -45,4 +45,10 @@ public class SysFunding extends BaseEntity {
     @ApiModelProperty(value = "结束时间")
     @TableField("end_time")
     private String endTime;
+    @ApiModelProperty(value = "经费描述1级")
+    @TableField("category1")
+    private String category1;
+    @ApiModelProperty(value = "经费描述2级")
+    @TableField("category2")
+    private String category2;
 }
