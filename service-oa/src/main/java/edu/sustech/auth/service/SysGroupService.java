@@ -3,6 +3,9 @@ package edu.sustech.auth.service;
 import edu.sustech.model.system.SysGroup;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import edu.sustech.re.system.PageUser;
+
+import java.util.List;
 
 /**
  * <p>
@@ -17,5 +20,5 @@ public interface SysGroupService extends IService<SysGroup> {
 
     boolean deleteGroupUser(Long groupId, Long userId);
 
-    boolean getUsersNotInGroup(Long groupId);
+    List<PageUser> getUsersNotInGroup(Long groupId);
 }

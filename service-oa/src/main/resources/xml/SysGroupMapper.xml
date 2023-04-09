@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.sustech.auth.mapper.SysGroupMapper">
+    <select id="selectUserNotInGroup" resultType="edu.sustech.model.system.SysUser">
+<!--        select * from user-->
+<!--        <where>-->
+<!--            <if test="wxNickName != null and wxNickName != ''">-->
+<!--                wx_nickname like CONCAT('%',#{wxNickName},'%');-->
+<!--            </if>-->
+<!--        </where>-->
+        select *
+        from sys_user
+        where id not in (select user_id
+        from sys_user_role where group_id = #{groupId})
+    </select>
+</mapper>

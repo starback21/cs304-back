@@ -71,12 +71,7 @@ public class SysUserController {
         for (SysUser user : userList) {
             index ++;
             if (index > (page - 1) * limit && index <= page * limit) {
-                PageUser tempUser = new PageUser();
-                tempUser.setKey(user.getUid());
-                tempUser.setName(user.getName());
-                tempUser.setEmail(user.getEmail());
-                tempUser.setPhone(user.getPhone());
-                users.add(tempUser);
+                setPageUserList(users, user);
             }
         }
         Map<String, Object> result = new HashMap<>(2);
@@ -84,6 +79,16 @@ public class SysUserController {
         result.put("total",userList.size());
         return Result.ok(result);
 
+    }
+
+    private static void setPageUserList(List<PageUser> users, SysUser user) {
+        PageUser tempUser = new PageUser();
+        tempUser.setId(user.getId());
+        tempUser.setKey(user.getUid());
+        tempUser.setName(user.getName());
+        tempUser.setEmail(user.getEmail());
+        tempUser.setPhone(user.getPhone());
+        users.add(tempUser);
     }
 
     @ApiOperation(value = "根据id获取用户")

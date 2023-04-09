@@ -169,13 +169,11 @@ public class SysGroupController {
             return Result.fail();
     }
 
-    @ApiOperation(value = "删除组内用户")
+    @ApiOperation(value = "获取不在目前课题组中的用户")
     @PostMapping("getUsersNotInGroup")
     public Result<List<PageUser>> getUsersNotInGroup(@RequestParam(value = "group_id") Long groupId){
-        if (sysGroupService.getUsersNotInGroup(groupId))
-            return Result.ok();
-        else
-            return Result.fail();
+        List<PageUser> list = sysGroupService.getUsersNotInGroup(groupId);
+            return Result.ok(list);
     }
 }
 

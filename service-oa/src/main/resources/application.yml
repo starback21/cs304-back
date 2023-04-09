@@ -3,3 +3,5 @@ spring:
     name: service-oa
   profiles:
     active: dev
+mybatis-plus:
+  mapper-locations: classpath:xml/*.xml

@@ -7,9 +7,14 @@ import edu.sustech.auth.service.SysGroupService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.sustech.auth.service.SysUserRoleService;
 import edu.sustech.model.system.SysGroup;
+import edu.sustech.model.system.SysUser;
 import edu.sustech.model.system.SysUserRole;
+import edu.sustech.re.system.PageUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -43,9 +48,19 @@ public class SysGroupServiceImpl extends ServiceImpl<SysGroupMapper, SysGroup> i
     }
 
     @Override
-    public boolean getUsersNotInGroup(Long groupId) {
-
-        return false;
+    public List<PageUser> getUsersNotInGroup(Long groupId) {
+        List<SysUser> userList = baseMapper.selectUserNotInGroup(groupId);
+        List<PageUser> list = new ArrayList<>();
+        for (SysUser user : userList){
+            PageUser tempUser = new PageUser();
+            tempUser.setId(user.getId());
+            tempUser.setKey(user.getUid());
+            tempUser.setName(user.getName());
+            tempUser.setEmail(user.getEmail());
+            tempUser.setPhone(user.getPhone());
+            list.add(tempUser);
+        }
+        return list;
     }
 
 }
