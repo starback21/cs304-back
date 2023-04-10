@@ -1,5 +1,6 @@
 package edu.sustech.auth.service;
 
+import edu.sustech.model.system.SysFunding;
 import edu.sustech.model.system.SysGroup;
 
 import com.baomidou.mybatisplus.extension.service.IService;
