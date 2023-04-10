@@ -233,7 +233,7 @@ public class SysFundingController {
         System.out.println(fundingId);
         List<SysFunding> foudingList = sysFundingService.list();
         List<Map<String, Object>> result = foudingList.stream()
-                .filter(f -> Objects.equals(f.getGroupId().toString(), groupId)&&Objects.equals(f.getFundingId().toString(), fundingId))
+                .filter(f -> Objects.equals(f.getGroupName(), groupId)&&Objects.equals(f.getFundingId().toString(), fundingId))
                 .map(f -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("category1", f.getCategory1());
@@ -249,23 +249,42 @@ public class SysFundingController {
     }
     @ApiOperation(value = "根据经费id和组id修改经费详情")
     @PostMapping ("modifyGroupFundDetail")
-    public Result modifyGroupFundDetail(@RequestBody List<Map<String, Object>> fundDetail) {
+    public Result modifyGroupFundDetail(@RequestBody Map<String, Object> fundDetail) {
+        System.out.println(fundDetail.get("groupId"));
+        String groupName = (String) fundDetail.get("groupId");
+        System.out.println(fundDetail.get("fundId"));
+        Long fundingId = Long.parseLong(fundDetail.get("fundId").toString());
+        System.out.println(fundDetail.get("detail"));
+        List<Map<String,String>>FUNDDETAIL= (List<Map<String, String>>) fundDetail.get("detail");
+        System.out.println(FUNDDETAIL);
         List<SysFunding> foudingList = sysFundingService.list();
-        List<Map<String, Object>> result = foudingList.stream()
-                .filter(f -> Objects.equals(f.getGroupId().toString(), fundDetail.get(0).get("groupId").toString())&&Objects.equals(f.getFundingId().toString(), fundDetail.get(0).get("fundingId").toString()))
+        List<Map<Object, Object>> result = foudingList.stream()
+                .filter(f -> Objects.equals(f.getGroupName(), groupName)&&Objects.equals(f.getFundingId(),fundingId))
                 .map(f -> {
-                    Map<String, Object> map = new HashMap<>();
+                    Map<Object, Object> map = new HashMap<>();
                     map.put("category1", f.getCategory1());
                     map.put("category2", f.getCategory2());
-                    map.put("fundName", f.getFundingName());
                     map.put("total", f.getTotalAmount());
                     map.put("cost", f.getCost());
                     map.put("left", f.getRemainAmount());
                     map.put("new","False");
+                    System.out.println(FUNDDETAIL.get(0).keySet());
+                    System.out.println(FUNDDETAIL.get(0).values());
+                    System.out.println(FUNDDETAIL.get(0).get("category1"));
+                    System.out.println(FUNDDETAIL.get(0).get("category2"));
+                    System.out.println(FUNDDETAIL.get(0).get("total"));
+                    System.out.println(FUNDDETAIL.get(0).get("left"));
+                    System.out.println(FUNDDETAIL.get(0).get("cost"));
+                    f.setCategory1(FUNDDETAIL.get(0).get("category1"));
+                    f.setCategory2(FUNDDETAIL.get(0).get("category2"));
+                    f.setTotalAmount(Long.parseLong(FUNDDETAIL.get(0).get("total")));
+                    f.setRemainAmount(Long.parseLong(FUNDDETAIL.get(0).get("left")));
+                    f.setCost(Long.parseLong(FUNDDETAIL.get(0).get("cost")));
+                    sysFundingService.updateById(f);
                     return map;
                 })
                 .collect(Collectors.toList());
-        return Result.ok(result);
+        return Result.ok();
     }
 
 
