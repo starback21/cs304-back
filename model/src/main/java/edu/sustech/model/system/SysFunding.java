@@ -12,9 +12,7 @@ import java.sql.Time;
 @ApiModel(description = "经费表")
 @TableName("sys_funding")
 public class SysFunding extends BaseEntity {
-    @ApiModelProperty(value = "id")
-    @TableField("id")
-    private Long id;
+
     @ApiModelProperty(value = "经费id")
     @TableField("funding_id")
     private Long fundingId;
