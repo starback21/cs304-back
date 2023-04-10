@@ -17,4 +17,6 @@ import java.util.List;
  */
 public interface SysGroupMapper extends BaseMapper<SysGroup> {
     List<SysUser> selectUserNotInGroup(@Param("groupId") Long id);
+
+    Long selectGroupIdByName(@Param("groupName") String name);
 }

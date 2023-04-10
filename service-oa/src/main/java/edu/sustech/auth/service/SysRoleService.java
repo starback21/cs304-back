@@ -12,5 +12,5 @@ public interface SysRoleService extends IService<SysRole> {
 
     boolean doAssign(Long groupId,Long userId);
 
-
+    boolean doAssignByName(String name,Long userId);
 }

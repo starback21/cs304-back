@@ -18,7 +18,9 @@ import java.util.List;
 public interface SysGroupService extends IService<SysGroup> {
     boolean addGroupUsers(Long groupId, Long userId);
 
-    boolean deleteGroupUser(Long groupId, Long userId);
+    boolean deleteGroupUser(String groupName, Long userId);
 
     List<PageUser> getUsersNotInGroup(Long groupId);
+
+    Long getIdByName(String name);
 }

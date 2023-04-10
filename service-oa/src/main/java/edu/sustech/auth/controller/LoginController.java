@@ -1,11 +1,13 @@
 package edu.sustech.auth.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import edu.sustech.common.result.Result;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Api(tags = "后台登录管理")
 @RestController
@@ -17,10 +19,17 @@ public class LoginController {
      * @return
      */
     @PostMapping("login")
-    public Result login() {
+    public Result login(@RequestBody JSONObject jsonParam) {
+        String account = jsonParam.get("account").toString();
+        String password = jsonParam.get("password").toString();
         Map<String, Object> map = new HashMap<>();
-        map.put("token","afasfsafawsf");
-        map.put("identity","admin");
+        if(Objects.equals(account, "admin") && Objects.equals(password, "12345")){
+            map.put("token","afasfsafawsf");
+            map.put("identity","admin");
+        }else {
+            map.put("token","sadqwrwqr");
+            map.put("identity","user");
+        }
         return Result.ok(map);
     }
     /**

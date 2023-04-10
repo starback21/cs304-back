@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * 用于返回分页查询中的user
  *与前端数据一致
@@ -20,4 +22,5 @@ public class PageGroup {
     Integer cost;
     Integer total;
     Integer left;
+    List<PageUser> users;
 }

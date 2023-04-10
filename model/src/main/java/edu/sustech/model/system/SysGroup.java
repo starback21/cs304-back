@@ -26,7 +26,7 @@ import lombok.EqualsAndHashCode;
 @TableName("sys_group")
 public class SysGroup extends BaseEntity {
 
-    private static final long serialVersionUID = 1L;
+//    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "组名")
     @TableField("group_name")

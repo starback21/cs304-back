@@ -66,5 +66,24 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         return sysUserRoleService.saveOrUpdate(sysUserRole,wrapper);
     }
 
+    @Override
+    public boolean doAssignByName(String name, Long userId) {
+        Long groupId = groupService.getIdByName(name);
+        int count2 = sysUserService.count(new QueryWrapper<SysUser>()
+                .eq("id",userId)
+        );
+        if (count2 == 0){
+            return false;
+        }
+        QueryWrapper<SysUserRole> wrapper = new QueryWrapper<>();
+        wrapper.eq("group_id",groupId).eq("user_id",userId);
+
+        SysUserRole sysUserRole = new SysUserRole();
+        sysUserRole.setGroupId(groupId);
+        sysUserRole.setUserId(userId);
+        sysUserRole.setRoleId(2L);
+        return sysUserRoleService.saveOrUpdate(sysUserRole,wrapper);
+    }
+
 
 }

@@ -1,15 +1,21 @@
 package edu.sustech.auth.controller;
 
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import edu.sustech.auth.service.SysGroupService;
 
+import edu.sustech.auth.service.SysRoleService;
+import edu.sustech.auth.service.SysUserRoleService;
+import edu.sustech.auth.service.SysUserService;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.SysGroup;
 
 
 import edu.sustech.model.system.SysUser;
+import edu.sustech.model.system.SysUserRole;
 import edu.sustech.re.system.PageGroup;
 import edu.sustech.re.system.PageUser;
 import io.swagger.annotations.Api;
@@ -39,6 +45,10 @@ public class SysGroupController {
     //注入service
     @Autowired
     private SysGroupService sysGroupService;
+    @Autowired
+    private SysUserRoleService userRoleService;
+    @Autowired
+    private SysUserService userService;
 
     @ApiOperation("查询所有课题组")
     @GetMapping("/findAll")
@@ -57,18 +67,42 @@ public class SysGroupController {
         return Result.ok(nameList);
     }
     @ApiOperation(value = "根据id查询")
-    @GetMapping("/get/{id}")
-    public Result get(@PathVariable Long id) {
+    @GetMapping("/getGroup")
+    public Result get(@RequestParam(value = "id")Long id) {
         SysGroup group = sysGroupService.getById(id);
-        if (group == null){
-            return  Result.fail();
+        PageGroup tempGroup = new PageGroup();
+        QueryWrapper<SysUserRole> wrapper = new QueryWrapper<>();
+        wrapper.eq("group_id",group.getId());
+        List<SysUserRole> tlist =  userRoleService.list(wrapper);
+        if (tlist.size() != 0){
+            List<PageUser> users = new ArrayList<>();
+            for (SysUserRole t:tlist){
+                Long userId = t.getUserId();
+                SysUser user = userService.getById(userId);
+                PageUser pageUser = new PageUser();
+                pageUser.setId(userId);
+                pageUser.setAdmin(t.getRoleId() == 2);
+                pageUser.setName(user.getName());
+                users.add(pageUser);
+            }
+            tempGroup.setUsers(users);
+        }else {
+            tempGroup.setUsers(null);
         }
-        return Result.ok(group);
+
+        tempGroup.setId(group.getId());
+        tempGroup.setName(group.getGroupName());
+        tempGroup.setCost(1000);
+        tempGroup.setTotal(100);
+        tempGroup.setLeft(80);
+
+        return Result.ok(tempGroup);
     }
     @ApiOperation(value = "分页获取课题组数据")
     @GetMapping("/getGroups")
     public Result<Map<String, Object>> getGroups(@RequestParam(value = "page") Long page,
                                  @RequestParam(value = "pageSize") Long limit
+
                             ){
         Map<String,Object> objectMap = new HashMap<>(2);
         List<SysGroup> groupList = sysGroupService.list();
@@ -78,11 +112,31 @@ public class SysGroupController {
             index ++;
             if (index > (page - 1) * limit && index <= page * limit) {
                 PageGroup tempGroup = new PageGroup();
+                QueryWrapper<SysUserRole> wrapper = new QueryWrapper<>();
+                wrapper.eq("group_id",group.getId());
+                List<SysUserRole> tlist =  userRoleService.list(wrapper);
+                if (tlist.size() != 0){
+                    List<PageUser> users = new ArrayList<>();
+                    for (SysUserRole t:tlist){
+                        Long userId = t.getUserId();
+                        SysUser user = userService.getById(userId);
+                        PageUser pageUser = new PageUser();
+                        pageUser.setId(userId);
+                        pageUser.setAdmin(t.getRoleId() == 2);
+                        pageUser.setName(user.getName());
+                        users.add(pageUser);
+                    }
+                    tempGroup.setUsers(users);
+                }else {
+                    tempGroup.setUsers(null);
+                }
+
                 tempGroup.setId(group.getId());
                 tempGroup.setName(group.getGroupName());
-                tempGroup.setCost(20);
+                tempGroup.setCost(1000);
                 tempGroup.setTotal(100);
                 tempGroup.setLeft(80);
+
                 groups.add(tempGroup);
             }
         }
@@ -106,10 +160,15 @@ public class SysGroupController {
     public Result save(@RequestBody JSONObject jsonParam) {
         // 调用 service 方法
         String name = jsonParam.get("name").toString();
+        JSONArray data = jsonParam.getJSONArray("users");
+        String js = JSONObject.toJSONString(data, SerializerFeature.WriteClassName);
+        List<Long> userList = JSONObject.parseArray(js, Long.class);
         SysGroup group = new SysGroup();
         group.setGroupName(name);
         boolean is_success = sysGroupService.save(group);
-
+//        for (Long id : userList){
+//            sysRoleService.doAssign()
+//        }
         if (is_success) {
             return Result.ok();
         } else {
@@ -161,17 +220,18 @@ public class SysGroupController {
     }
     @ApiOperation(value = "删除组内用户")
     @PostMapping("deleteGroupUser")
-    public Result deleteGroupUser(@RequestParam(value = "group_id") Long groupId,
-                                  @RequestParam(value = "user_id") Long userId){
-        if (sysGroupService.deleteGroupUser(groupId,userId))
+    public Result deleteGroupUser(@RequestBody JSONObject jsonParam){
+        String groupName = jsonParam.getString("group");
+        Long userId = jsonParam.getLong("user");
+        if (sysGroupService.deleteGroupUser(groupName,userId))
             return Result.ok();
         else
             return Result.fail();
     }
 
     @ApiOperation(value = "获取不在目前课题组中的用户")
-    @PostMapping("getUsersNotInGroup")
-    public Result<List<PageUser>> getUsersNotInGroup(@RequestParam(value = "group_id") Long groupId){
+    @GetMapping("getUsersNotInGroup")
+    public Result<List<PageUser>> getUsersNotInGroup(@RequestParam(value = "groupName") Long groupId){
         List<PageUser> list = sysGroupService.getUsersNotInGroup(groupId);
             return Result.ok(list);
     }
