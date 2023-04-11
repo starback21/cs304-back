@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.util.Json;
 import lombok.var;
+import nonapi.io.github.classgraph.json.Id;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -507,5 +508,11 @@ public class SysFundingController {
         return Result.ok(result);
     }
 
+    @ApiOperation(value = "根据id获取经费信息")
+    @GetMapping("getFundStatistics")
+    private Result getFundStatistics(@RequestParam(value = "id") Long fundId){
+
+        return Result.ok();
+    }
 
 }

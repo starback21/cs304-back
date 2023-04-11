@@ -9,7 +9,7 @@ CREATE TABLE `sys_role` (
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:不可用 1:可用）',
+  `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:可用 1:不可用）',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='角色';
 
@@ -22,8 +22,9 @@ CREATE TABLE `sys_group` (
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:不可用 1:可用）',
-  PRIMARY KEY (`id`)
+  `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:可用 1:不可用）',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_name` (`group_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='课题组';
 
 drop table if exists sys_user;
@@ -39,10 +40,11 @@ CREATE TABLE `sys_user` (
   `status` tinyint(3) DEFAULT NULL COMMENT '状态（1：正常 0：停用）',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:不可用 1:可用）',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_uid` (`uid`)
+  `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:可用 1:不可用）',
+  PRIMARY KEY (`id`)
+#   UNIQUE KEY `idx_uid` (`uid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+
 
 drop table if exists sys_user_role;
 CREATE TABLE `sys_user_role` (
@@ -52,14 +54,15 @@ CREATE TABLE `sys_user_role` (
   `user_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '用户id',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:不可用 1:可用）',
+  `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:可用 1:不可用）',
   PRIMARY KEY (`id`),
   KEY `idx_group_id` (`group_id`),
   KEY `idx_role_id` (`role_id`),
   KEY `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='用户角色';
 
-CREATE TABLE `sys_Application` (
+drop table if exists sys_application;
+CREATE TABLE `sys_application` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `title` varchar(50) NOT NULL DEFAULT '' COMMENT '标题',
   `group` bigint(20) NOT NULL DEFAULT '0' COMMENT '组id',
@@ -71,7 +74,7 @@ CREATE TABLE `sys_Application` (
   `comment` varchar(100) NOT NULL DEFAULT '' COMMENT '评价',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:不可用 1:可用）',
+  `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:可用 1:不可用）',
   PRIMARY KEY (`id`),
   KEY `idx_group_id` (`group`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='申请';
@@ -79,18 +82,18 @@ CREATE TABLE `sys_Application` (
 drop table if exists sys_funding;
 CREATE TABLE sys_funding (
   id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键id',
-  funding_id INT NOT NULL COMMENT '经费id',
-  funding_name VARCHAR(20) NOT NULL COMMENT '经费名称',
-  group_id INT NOT NULL COMMENT '课题组id',
-  group_name VARCHAR(20) NOT NULL COMMENT '课题组名称',
-  total_amount DECIMAL(10, 2) NOT NULL COMMENT '总经费',
-  cost DECIMAL(10, 2) NOT NULL COMMENT '单次花费',
-  remain_amount DECIMAL(10, 2) NOT NULL COMMENT '剩余经费',
-   status  VARCHAR(20) NOT NULL DEFAULT 'COMPLETED' COMMENT '状态',
-  `start_time` VARCHAR(20) NOT NULL COMMENT '开始时间',
-   end_time VARCHAR(20) NOT NULL COMMENT '结束时间',
-   category1 VARCHAR(50)  COMMENT '一级分类',
-category2 VARCHAR(50) COMMENT '二级分类',
+  funding_id INT NOT NULL default 114514 COMMENT '经费id' ,
+  funding_name VARCHAR(20) NOT NULL default 'test' COMMENT '经费名称',
+  group_id INT NOT NULL default '114514' COMMENT '课题组id',
+  group_name VARCHAR(20) NOT NULL default 'test'COMMENT '课题组名称',
+  total_amount DECIMAL(10, 2) NOT NULL default '9999999'COMMENT '总经费',
+  cost DECIMAL(10, 2) NOT NULL default 0 COMMENT '单次花费',
+  remain_amount DECIMAL(10, 2) default 9999 NOT NULL COMMENT '剩余经费',
+   status  VARCHAR(20) NOT NULL DEFAULT 'complete' COMMENT '状态',
+  `start_time` VARCHAR(20) default '2019' NOT NULL COMMENT '开始时间',
+   end_time VARCHAR(20) NOT NULL default '2021' COMMENT '结束时间',
+   category1 VARCHAR(50) default 'test'COMMENT '一级分类',
+    category2 VARCHAR(50) default'test1'  COMMENT '二级分类',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:不可用 1:可用）    '
