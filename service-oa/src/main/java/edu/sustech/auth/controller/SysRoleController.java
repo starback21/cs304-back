@@ -36,9 +36,10 @@ public class SysRoleController {
     @ApiOperation(value = "更改用户权限")
     @PostMapping("/changeAdmin")
     public Result changeAdmin(@RequestBody JSONObject jsonParam) {
-        String groupName = jsonParam.getString("group");
+//        String groupName = jsonParam.getString("group");
+        Long groupId = jsonParam.getLong("group");
         Long userId = jsonParam.getLong("user");
-        if (sysRoleService.doAssignByName(groupName,userId))
+        if (sysRoleService.doAssign(groupId,userId))
             return Result.ok();
         else
             return Result.fail();

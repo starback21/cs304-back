@@ -3,6 +3,7 @@ package edu.sustech.auth.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import edu.sustech.auth.service.SysGroupService;
@@ -68,11 +69,11 @@ public class SysGroupController {
     }
     @ApiOperation(value = "根据id查询")
     @GetMapping("/getGroup")
-    public Result get(@RequestParam(value = "id")Long id) {
+    public Result<PageGroup> get(@RequestParam(value = "id")Long id) {
         SysGroup group = sysGroupService.getById(id);
         PageGroup tempGroup = new PageGroup();
         QueryWrapper<SysUserRole> wrapper = new QueryWrapper<>();
-        wrapper.eq("group_id",group.getId());
+        wrapper.eq("group_id",id);
         List<SysUserRole> tlist =  userRoleService.list(wrapper);
         if (tlist.size() != 0){
             List<PageUser> users = new ArrayList<>();
@@ -102,7 +103,6 @@ public class SysGroupController {
     @GetMapping("/getGroups")
     public Result<Map<String, Object>> getGroups(@RequestParam(value = "page") Long page,
                                  @RequestParam(value = "pageSize") Long limit
-
                             ){
         Map<String,Object> objectMap = new HashMap<>(2);
         List<SysGroup> groupList = sysGroupService.list();
@@ -130,7 +130,7 @@ public class SysGroupController {
                 }else {
                     tempGroup.setUsers(null);
                 }
-
+                tempGroup.setUsers(null);
                 tempGroup.setId(group.getId());
                 tempGroup.setName(group.getGroupName());
                 tempGroup.setCost(1000);
@@ -188,7 +188,7 @@ public class SysGroupController {
     }
 
     @ApiOperation(value = "移除课题组")
-    @PostMapping("/remove")
+    @PostMapping("/deleteGroup")
     public Result remove(@RequestBody JSONObject jsonParam) {
         Long id = jsonParam.getLong("id");
         boolean is_success = sysGroupService.removeById(id);
@@ -199,31 +199,41 @@ public class SysGroupController {
         }
     }
 
-    @ApiOperation(value = "根据id列表删除")
-    @DeleteMapping("/batchRemove")
-    public Result batchRemove(@RequestBody List<Long> idList) {
-        boolean is_success = sysGroupService.removeByIds(idList);
-        if (is_success){
-            return Result.ok();
-        }else {
-            return Result.fail();
-        }
-    }
+//    @ApiOperation(value = "根据id列表删除")
+//    @DeleteMapping("/batchRemove")
+//    public Result batchRemove(@RequestBody List<Long> idList) {
+//        boolean is_success = sysGroupService.removeByIds(idList);
+//        if (is_success){
+//            return Result.ok();
+//        }else {
+//            return Result.fail();
+//        }
+//    }
     @ApiOperation(value = "添加用户到课题组")
     @PostMapping("addGroupUsers")
-    public Result addGroupUsers(@RequestParam(value = "group_id") Long groupId,
-                                @RequestParam(value = "user_id") Long userId){
-        if (sysGroupService.addGroupUsers(groupId,userId))
-            return Result.ok();
-        else
-            return Result.fail();
+    public Result addGroupUsers(@RequestBody JSONObject jsonParam){
+        Long groupId = jsonParam.getLong("group");
+        Map<String,Object> params = JSONObject.parseObject(jsonParam.getString("form"),
+                new TypeReference<Map<String,Object>>(){});
+        System.out.println("groupId: "+ groupId);
+        System.out.println("params: " + params);
+        System.out.println(".........................");
+//        JSONArray data = jsonParam.getJSONArray("idList");
+//        String js = JSONObject.toJSONString(data, SerializerFeature.WriteClassName);
+//        List<Long> idList = JSONObject.parseArray(js, Long.class);
+//        if (sysGroupService.addGroupUsers(groupId,idList))
+//            return Result.ok();
+//        else
+//            return Result.fail();
+        return Result.ok();
     }
     @ApiOperation(value = "删除组内用户")
     @PostMapping("deleteGroupUser")
     public Result deleteGroupUser(@RequestBody JSONObject jsonParam){
-        String groupName = jsonParam.getString("group");
+        //        String groupName = jsonParam.getString("group");
+        Long groupId = jsonParam.getLong("group");
         Long userId = jsonParam.getLong("user");
-        if (sysGroupService.deleteGroupUser(groupName,userId))
+        if (sysGroupService.deleteGroupUser(groupId,userId))
             return Result.ok();
         else
             return Result.fail();
@@ -231,9 +241,10 @@ public class SysGroupController {
 
     @ApiOperation(value = "获取不在目前课题组中的用户")
     @GetMapping("getUsersNotInGroup")
-    public Result<List<PageUser>> getUsersNotInGroup(@RequestParam(value = "groupName") Long groupId){
+    public Result<List<PageUser>> getUsersNotInGroup(@RequestParam(value = "groupName") String name){
+        Long groupId = sysGroupService.getIdByName(name);
         List<PageUser> list = sysGroupService.getUsersNotInGroup(groupId);
-            return Result.ok(list);
+        return Result.ok(list);
     }
 }
 

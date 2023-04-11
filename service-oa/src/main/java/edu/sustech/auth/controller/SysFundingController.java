@@ -33,11 +33,12 @@ public class SysFundingController {
         List<Map<String, Object>> result = list.stream()
                 .map(f -> {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("key", f.getId());
+                    map.put("key", f.getId().toString());
                     map.put("id", f.getFundingId());
                     map.put("name", f.getFundingName());
-                    Map<Integer,Integer>dataRange = new HashMap<>();
-                    dataRange.put(2019,2021);
+                    int[] dataRange = new int[2];
+                    dataRange[0] = 2019;
+                    dataRange[1] = 2021;
                     map.put("dataRange", dataRange);
                     map.put("totalNum", f.getTotalAmount());
                     map.put("leftNum", f.getRemainAmount());

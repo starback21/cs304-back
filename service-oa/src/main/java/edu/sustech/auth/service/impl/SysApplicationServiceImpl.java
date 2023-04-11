@@ -6,6 +6,8 @@ import edu.sustech.auth.service.SysApplicationService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>
  * 申请 服务实现类
@@ -17,4 +19,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class SysApplicationServiceImpl extends ServiceImpl<SysApplicationMapper, SysApplication> implements SysApplicationService {
 
+    @Override
+    public List<SysApplication> selectAll() {
+        return baseMapper.selectAll();
+    }
 }

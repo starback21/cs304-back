@@ -1,6 +1,7 @@
 package edu.sustech.auth.controller;
 
 
+import com.alibaba.fastjson.JSONObject;
 import edu.sustech.auth.service.SysGroupService;
 import edu.sustech.model.system.SysApplication;
 import edu.sustech.auth.service.SysApplicationService;
@@ -35,19 +36,15 @@ public class SysApplicationController {
 
     @ApiOperation(value = "添加申请")
     @PostMapping("/createApplication")
-    public Result save(@RequestBody SysApplication application){
-        boolean is_success = service.save(application);
-        if (is_success) {
-            return Result.ok();
-        } else {
-            return Result.fail();
-        }
+    public Result save(@RequestBody JSONObject jsonParam){
+        System.out.println(jsonParam);
+        return Result.ok();
     }
 
     @ApiOperation(value = "获取申请")
     @GetMapping("/getApplications")
     public Result<Map<String, Object>> getApplications(@RequestParam(value = "page") int page){
-        List<SysApplication> list = service.list();
+        List<SysApplication> list = service.selectAll();
         List<PageApplication> data = new ArrayList<>();
         int index = 0;
         for (SysApplication a : list){
@@ -71,6 +68,22 @@ public class SysApplicationController {
         result.put("total",data.size());
         return Result.ok(result);
 
+    }
+
+    @ApiOperation("通过申请")
+    @PostMapping("/permitApplication")
+    public Result permitApplication(@RequestBody JSONObject jsonParam){
+        Long id = jsonParam.getLong("id");
+
+        return Result.ok();
+    }
+
+    @ApiOperation("通过申请")
+    @PostMapping("/denyApplications")
+    public Result denyApplications(@RequestBody JSONObject jsonParam){
+        Long id = jsonParam.getLong("id");
+
+        return Result.ok();
     }
 }
 

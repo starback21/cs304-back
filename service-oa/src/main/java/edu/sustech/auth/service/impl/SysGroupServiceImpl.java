@@ -41,8 +41,7 @@ public class SysGroupServiceImpl extends ServiceImpl<SysGroupMapper, SysGroup> i
     }
 
     @Override
-    public boolean deleteGroupUser(String groupName, Long userId) {
-        Long groupId = baseMapper.selectGroupIdByName(groupName);
+    public boolean deleteGroupUser(Long groupId, Long userId) {
         QueryWrapper<SysUserRole> wrapper = new QueryWrapper<>();
         wrapper.eq("group_id",groupId).eq("user_id",userId);
         return sysUserRoleService.remove(wrapper);
