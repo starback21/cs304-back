@@ -66,29 +66,7 @@ public class SysFundingController {
             result.add(map);
         }
         return Result.ok(result);
-        /*List<Map<String, Object>> result = list.stream()
-                .map(f -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("key", f.getId());
-                    map.put("id", f.getFundingId());
-                    map.put("name", f.getFundingName());
-                    Map<Integer,Integer>dataRange = new HashMap<>();
-                    dataRange.put(2019,2021);
-                    map.put("dataRange", dataRange);
-                    map.put("totalNum", f.getTotalAmount());
-                    map.put("leftNum", f.getRemainAmount());
-                    if(f.getTotalAmount()!=0){
-                        map.put("percent",(f.getRemainAmount()*100/f.getTotalAmount()));
-                    }else{
-                        map.put("percent",0);
-                    }
-                    map.put("state", f.getStatus());
-                    map.put("leftDay",100);
-                    map.put("disabled", f.getIsDeleted());
-                    return map;
-                })
-                .collect(Collectors.toList());
-        return Result.ok(result);*/
+
     }
     @ApiOperation(value = "根据经费id获取组")
     @GetMapping("getGroupByFund")
