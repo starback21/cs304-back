@@ -133,7 +133,6 @@ public class SysUserController {
         return Result.ok();
     }
     @ApiOperation(value = "根据id列表删除")
-//    @DeleteMapping("/batchRemove")
     @PostMapping("/batchRemove")
     public Result batchRemove(@RequestBody JSONObject jsonParam) {
         JSONArray data = jsonParam.getJSONArray("idList");
