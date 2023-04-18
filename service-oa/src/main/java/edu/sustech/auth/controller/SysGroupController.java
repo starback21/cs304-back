@@ -166,9 +166,6 @@ public class SysGroupController {
         SysGroup group = new SysGroup();
         group.setGroupName(name);
         boolean is_success = sysGroupService.save(group);
-//        for (Long id : userList){
-//            sysRoleService.doAssign()
-//        }
         if (is_success) {
             return Result.ok();
         } else {
