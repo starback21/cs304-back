@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface SysRoleService extends IService<SysRole> {
 
-    Map<Long, Long> findRoleByAdminId(Long userId);
+    Map<Long, Integer> findRoleByAdminId(Long userId);
 
     boolean doAssign(Long groupId,Long userId);
 

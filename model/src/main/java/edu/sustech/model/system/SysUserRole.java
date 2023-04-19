@@ -18,14 +18,21 @@ public class SysUserRole extends BaseEntity {
 	@TableField("group_id")
 	private Long groupId;
 
+	@ApiModelProperty(value = "课题组名称")
+	@TableField("group_name")
+	private String groupName;
+
 	@ApiModelProperty(value = "角色id")
 	@TableField("role_id")
-	private Long roleId;
+	private int roleId;
 
 	@ApiModelProperty(value = "用户id")
 	@TableField("user_id")
 	private Long userId;
 
+	@ApiModelProperty(value = "用户姓名")
+	@TableField("user_name")
+	private String userName;
 
 }
 

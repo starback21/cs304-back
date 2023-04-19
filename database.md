@@ -50,8 +50,10 @@ drop table if exists sys_user_role;
 CREATE TABLE `sys_user_role` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `group_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '组id',
-  `role_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '角色id',
+  `group_name` varchar(20) NOT NULL DEFAULT '' COMMENT '课题组名称',
+  `role_id` int(5) NOT NULL DEFAULT '0' COMMENT '角色id',
   `user_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '用户id',
+  `user_name` varchar(20) DEFAULT NULL COMMENT '昵称',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:可用 1:不可用）',

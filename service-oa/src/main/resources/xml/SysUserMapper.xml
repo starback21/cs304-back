@@ -6,4 +6,12 @@
         from sys_user
         where id = #{userId}
     </select>
+    
+    <select id="selectUid" resultType="Integer">
+        select count(uid) from sys_user where uid = #{uid}
+    </select>
+
+    <select id="selectIdByName" resultType="Long">
+        select id from sys_user where name = #{name}
+    </select>
 </mapper>

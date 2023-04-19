@@ -23,4 +23,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public SysUser getUserById(Long userId) {
         return baseMapper.selectGroupIdByName(userId);
     }
+
+    @Override
+    public Boolean selectUidSame(Long uid) {
+        int re = baseMapper.selectUid(uid);
+        return re != 0;
+    }
+
+    @Override
+    public Long selectIdByName(String name) {
+        return baseMapper.selectIdByName(name);
+    }
 }
