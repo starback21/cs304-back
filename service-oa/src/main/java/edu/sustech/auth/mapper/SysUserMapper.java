@@ -14,4 +14,8 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface SysUserMapper extends BaseMapper<SysUser> {
     SysUser selectGroupIdByName(@Param("userId") Long id);
+
+    int selectUid(@Param("uid")Long uid);
+
+    Long selectIdByName(@Param("name")String name);
 }

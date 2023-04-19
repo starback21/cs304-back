@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -42,29 +39,38 @@ public class SysUserController {
     @ApiOperation("用户条件分页查询")
     @GetMapping("getUsers")
     public Result<Map<String, Object>> index(@RequestParam(value = "page") Long page,
-                             @RequestParam(value = "pageSize") Long limit,
-                             SysUserQueryVo sysUserQueryVo
+                                             @RequestParam(value = "pageSize") Long limit,
+                                             @RequestParam(value = "id",required = false)Long userid
                                         ) {
+        Map<String, Object> result = new HashMap<>(2);
         //封装条件，判断条件值不为空
-        LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
-        //获取条件值
-        String uid = sysUserQueryVo.getKeyword();
-        String createTimeBegin = sysUserQueryVo.getCreateTimeBegin();
-        String createTimeEnd = sysUserQueryVo.getCreateTimeEnd();
-        //判断条件值不为空
-        //like 模糊查询
-        if(!StringUtils.isEmpty(uid)) {
-            wrapper.like(SysUser::getUid,uid);
-        }
-        //ge 大于等于
-        if(!StringUtils.isEmpty(createTimeBegin)) {
-            wrapper.ge(SysUser::getCreateTime,createTimeBegin);
-        }
-        //le 小于等于
-        if(!StringUtils.isEmpty(createTimeEnd)) {
-            wrapper.le(SysUser::getCreateTime,createTimeEnd);
-        }
-
+        QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
+//        //获取条件值
+//        String uid = sysUserQueryVo.getKeyword();
+//        String createTimeBegin = sysUserQueryVo.getCreateTimeBegin();
+//        String createTimeEnd = sysUserQueryVo.getCreateTimeEnd();
+//        //判断条件值不为空
+//        //like 模糊查询
+//        if(!StringUtils.isEmpty(uid)) {
+//            wrapper.like(SysUser::getUid,uid);
+//        }
+//        //ge 大于等于
+//        if(!StringUtils.isEmpty(createTimeBegin)) {
+//            wrapper.ge(SysUser::getCreateTime,createTimeBegin);
+//        }
+//        //le 小于等于
+//        if(!StringUtils.isEmpty(createTimeEnd)) {
+//            wrapper.le(SysUser::getCreateTime,createTimeEnd);
+//        }
+//        if (userid != null){
+//            wrapper.eq("uid",userid);
+//            List<SysUser> userList = service.list(wrapper);
+//            SysUser user = userList.get(0);
+//            PageUser tempUser = new PageUser(user.getUid(),user.getId(),user.getName(),
+//                   user.getEmail(), user.getPhone(),user.)
+//            result.put("users",)
+//        }
+        wrapper.orderByAsc("uid");
         List<SysUser> userList = service.list(wrapper);
         List<PageUser> users = new ArrayList<>();
         int index = 0;
@@ -77,12 +83,15 @@ public class SysUserController {
                 tempUser.setName(user.getName());
                 tempUser.setEmail(user.getEmail());
                 tempUser.setPhone(user.getPhone());
+
                 users.add(tempUser);
             }
         }
-        Map<String, Object> result = new HashMap<>(2);
+
         result.put("users",users);
         result.put("total",userList.size());
+
+
         return Result.ok(result);
 
     }
@@ -110,7 +119,17 @@ public class SysUserController {
     @ApiOperation(value = "添加用户")
     @PostMapping("/createAccount")
     public Result save(@RequestBody SysUser user) {
-        user.setPassword("123456");
+        //获取一个范围在100000-199999 之间的随机uid，共九千九百九十九个uid
+        Random random = new Random();
+        int l1 = random.nextInt(199999) + 100000;
+        //当uid不重复时
+        while (service.selectUidSame((long) l1)){
+            l1 = random.nextInt(199999) + 100000;
+        }
+        user.setUid((long) l1);
+        //初始密码即为uid
+        String psw = String.valueOf(l1);
+        user.setPassword(psw);
         boolean is_success = service.save(user);
         if (is_success) {
             return Result.ok();
@@ -119,21 +138,21 @@ public class SysUserController {
         }
     }
 
-    @ApiOperation(value = "更新用户")
-    @PutMapping("/update")
-    public Result updateById(@RequestBody SysUser user) {
-        service.updateById(user);
-        return Result.ok();
-    }
-
-    @ApiOperation(value = "删除用户")
-    @DeleteMapping("/remove/{id}")
-    public Result remove(@PathVariable Long id) {
-        service.removeById(id);
-        return Result.ok();
-    }
+//    @ApiOperation(value = "更新用户")
+//    @PutMapping("/update")
+//    public Result updateById(@RequestBody SysUser user) {
+//        service.updateById(user);
+//        return Result.ok();
+//    }
+//
+//    @ApiOperation(value = "删除用户")
+//    @DeleteMapping("/remove/{id}")
+//    public Result remove(@PathVariable Long id) {
+//        service.removeById(id);
+//        return Result.ok();
+//    }
     @ApiOperation(value = "根据id列表删除")
-    @PostMapping("/batchRemove")
+    @PostMapping("/deleteUsers")
     public Result batchRemove(@RequestBody JSONObject jsonParam) {
         JSONArray data = jsonParam.getJSONArray("idList");
         String js = JSONObject.toJSONString(data, SerializerFeature.WriteClassName);

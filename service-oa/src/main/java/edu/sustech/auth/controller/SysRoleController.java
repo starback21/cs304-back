@@ -2,6 +2,7 @@ package edu.sustech.auth.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import edu.sustech.auth.service.SysGroupService;
 import edu.sustech.auth.service.SysRoleService;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.SysRole;
@@ -25,21 +26,23 @@ public class SysRoleController {
     //注入service
     @Autowired
     private SysRoleService sysRoleService;
-
+    @Autowired
+    private SysGroupService groupService;
     @ApiOperation(value = "根据用户获取角色数据")
     @GetMapping("/toAssign/{userId}")
     public Result toAssign(@PathVariable Long userId) {
-        Map<Long, Long> roleMap = sysRoleService.findRoleByAdminId(userId);
+        Map<Long, Integer> roleMap = sysRoleService.findRoleByAdminId(userId);
         return Result.ok(roleMap);
     }
 
     @ApiOperation(value = "更改用户权限")
-    @PostMapping("/changeAdmin")
+    @PostMapping("/changeGroupUserAdmin")
     public Result changeAdmin(@RequestBody JSONObject jsonParam) {
-//        String groupName = jsonParam.getString("group");
-        Long groupId = jsonParam.getLong("group");
+
+        String groupName = jsonParam.getString("group");
+        Long id = groupService.getIdByName(groupName);
         Long userId = jsonParam.getLong("user");
-        if (sysRoleService.doAssign(groupId,userId))
+        if (sysRoleService.doAssign(id,userId))
             return Result.ok();
         else
             return Result.fail();

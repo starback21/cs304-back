@@ -4,6 +4,7 @@ package edu.sustech.auth.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.generator.config.INameConvert;
 import edu.sustech.auth.mapper.SysRoleMapper;
 import edu.sustech.auth.service.SysGroupService;
 import edu.sustech.auth.service.SysRoleService;
@@ -31,15 +32,15 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Autowired
     private SysGroupService groupService;
     @Override
-    public Map<Long, Long> findRoleByAdminId(Long userId) {
+    public Map<Long, Integer> findRoleByAdminId(Long userId) {
         //根据userid查询 user_role 表，查询对应角色所在组与对应角色
         LambdaQueryWrapper<SysUserRole> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysUserRole::getUserId,userId);
         List<SysUserRole> existUserRoleList = sysUserRoleService.list(wrapper);
-        Map<Long,Long> groupRole = new HashMap<>();
+        Map<Long, Integer> groupRole = new HashMap<>();
         for (SysUserRole sysUserRole : existUserRoleList) {
             Long gid = sysUserRole.getGroupId();
-            Long rid = sysUserRole.getRoleId();
+            int rid = sysUserRole.getRoleId();
             groupRole.put(gid,rid);
         }
         return groupRole;
@@ -58,11 +59,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         }
         QueryWrapper<SysUserRole> wrapper = new QueryWrapper<>();
         wrapper.eq("group_id",groupId).eq("user_id",userId);
-
+        SysUserRole role = sysUserRoleService.list(wrapper).get(0);
         SysUserRole sysUserRole = new SysUserRole();
+        if (role.getRoleId() == 2) sysUserRole.setRoleId(3);
+        else sysUserRole.setRoleId(2);
         sysUserRole.setGroupId(groupId);
         sysUserRole.setUserId(userId);
-        sysUserRole.setRoleId(2L);
         return sysUserRoleService.saveOrUpdate(sysUserRole,wrapper);
     }
 
@@ -81,7 +83,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         SysUserRole sysUserRole = new SysUserRole();
         sysUserRole.setGroupId(groupId);
         sysUserRole.setUserId(userId);
-        sysUserRole.setRoleId(2L);
+        sysUserRole.setRoleId(2);
         return sysUserRoleService.saveOrUpdate(sysUserRole,wrapper);
     }
 

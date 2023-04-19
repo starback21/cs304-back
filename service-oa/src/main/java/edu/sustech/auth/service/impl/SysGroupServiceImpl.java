@@ -6,6 +6,7 @@ import edu.sustech.auth.mapper.SysGroupMapper;
 import edu.sustech.auth.service.SysGroupService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.sustech.auth.service.SysUserRoleService;
+import edu.sustech.auth.service.SysUserService;
 import edu.sustech.model.system.SysGroup;
 import edu.sustech.model.system.SysUser;
 import edu.sustech.model.system.SysUserRole;
@@ -29,15 +30,52 @@ public class SysGroupServiceImpl extends ServiceImpl<SysGroupMapper, SysGroup> i
 
     @Autowired
     private SysUserRoleService sysUserRoleService;
+    @Autowired
+    private SysUserService userService;
+
     @Override
-    public boolean addGroupUsers(Long groupId, Long userId) {
+    public boolean createAndAddUser(Long groupId,String groupName, List<String> userNames) {
         SysUserRole sysUserRole = new SysUserRole();
-        sysUserRole.setUserId(userId);
         sysUserRole.setGroupId(groupId);
-        sysUserRole.setRoleId(3L);
-        QueryWrapper<SysUserRole> wrapper = new QueryWrapper<>();
-        wrapper.eq("group_id",groupId).eq("user_id",userId);
-        return sysUserRoleService.saveOrUpdate(sysUserRole,wrapper);
+        sysUserRole.setGroupName(groupName);
+
+        sysUserRole.setRoleId(3);
+        for (String n : userNames){
+            Long id = userService.selectIdByName(n);
+            sysUserRole.setUserId(id);
+            sysUserRole.setUserName(n);
+            sysUserRoleService.save(sysUserRole);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean addGroupUsers(String name, List<String> userList, List<String> adminList) {
+        SysUserRole sysUserRole = new SysUserRole();
+        sysUserRole.setGroupName(name);
+        Long groupId = baseMapper.selectGroupIdByName(name);
+        sysUserRole.setGroupId(groupId);
+        for (String s : userList){
+            boolean isAdmin = false;
+            Long id = userService.selectIdByName(s);
+            sysUserRole.setUserId(id);
+            sysUserRole.setUserName(s);
+            sysUserRole.setRoleId(3);
+            if (adminList.size() > 0) {
+                for (String admin : adminList) {
+                    if (admin.equals(s)) {
+                        sysUserRole.setRoleId(2);
+                        isAdmin = true;
+
+                    }
+                }
+            }
+            if (isAdmin) adminList.remove(s);
+            sysUserRoleService.save(sysUserRole);
+        }
+
+        return true;
     }
 
     @Override

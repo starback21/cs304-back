@@ -13,4 +13,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface SysUserService extends IService<SysUser> {
     SysUser getUserById(Long userId);
+
+    Boolean selectUidSame(Long uid);
+
+    Long selectIdByName(String name);
 }
