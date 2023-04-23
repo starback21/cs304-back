@@ -21,4 +21,6 @@ public enum ResultCodeEnum {
         this.code = code;
         this.msg = msg;
     }
+
+
 }

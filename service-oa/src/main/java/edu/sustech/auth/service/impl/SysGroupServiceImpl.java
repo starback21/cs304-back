@@ -103,8 +103,7 @@ public class SysGroupServiceImpl extends ServiceImpl<SysGroupMapper, SysGroup> i
 
     @Override
     public Long getIdByName(String name) {
-        Long id = baseMapper.selectGroupIdByName(name);
-        return id;
+        return baseMapper.selectGroupIdByName(name);
     }
 
 }

@@ -17,4 +17,6 @@ public interface SysUserService extends IService<SysUser> {
     Boolean selectUidSame(Long uid);
 
     Long selectIdByName(String name);
+
+    SysUser getUserByName(String name);
 }

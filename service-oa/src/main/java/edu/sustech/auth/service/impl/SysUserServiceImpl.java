@@ -1,5 +1,6 @@
 package edu.sustech.auth.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import edu.sustech.model.system.SysUser;
 import edu.sustech.auth.mapper.SysUserMapper;
@@ -33,5 +34,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public Long selectIdByName(String name) {
         return baseMapper.selectIdByName(name);
+    }
+
+    @Override
+    public SysUser getUserByName(String name) {
+       return this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getName, name));
     }
 }

@@ -6,6 +6,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import edu.sustech.auth.service.SysUserService;
+import edu.sustech.common.utils.MD5;
 import edu.sustech.re.system.PageUser;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.SysUser;
@@ -70,6 +71,7 @@ public class SysUserController {
 //                   user.getEmail(), user.getPhone(),user.)
 //            result.put("users",)
 //        }
+        wrapper.ne("name","admin");
         wrapper.orderByAsc("uid");
         List<SysUser> userList = service.list(wrapper);
         List<PageUser> users = new ArrayList<>();
@@ -129,7 +131,9 @@ public class SysUserController {
         user.setUid((long) l1);
         //初始密码即为uid
         String psw = String.valueOf(l1);
-        user.setPassword(psw);
+        //加密密码
+        String passwordMd5 = MD5.encrypt(psw);
+        user.setPassword(passwordMd5);
         boolean is_success = service.save(user);
         if (is_success) {
             return Result.ok();

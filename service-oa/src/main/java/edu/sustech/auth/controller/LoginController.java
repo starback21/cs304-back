@@ -1,9 +1,18 @@
 package edu.sustech.auth.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import edu.sustech.auth.service.SysUserService;
+import edu.sustech.common.handler.SpecialException;
+import edu.sustech.common.jwt.JwtHelper;
 import edu.sustech.common.result.Result;
+import edu.sustech.common.utils.MD5;
+import edu.sustech.model.system.SysUser;
 import io.swagger.annotations.Api;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,23 +20,37 @@ import java.util.Objects;
 
 @Api(tags = "后台登录管理")
 @RestController
-@CrossOrigin
 @RequestMapping("/user")
 public class LoginController {
     /**
      * 登录
      * @return
      */
+    @Autowired
+    SysUserService userService;
     @PostMapping("login")
     public Result login(@RequestBody JSONObject jsonParam) {
         String account = jsonParam.get("account").toString();
         String password = jsonParam.get("password").toString();
+        LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysUser::getName,account);
+        SysUser sysUser = userService.getOne(wrapper)   ;
+        if(null == sysUser) {
+            throw new SpecialException(201,"用户不存在");
+        }
+        if(!MD5.encrypt(password).equals(sysUser.getPassword())) {
+            throw new SpecialException(201,"密码错误");
+        }
+
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("token", JwtHelper.createToken(sysUser.getId(), sysUser.getUsername()));
+
         Map<String, Object> map = new HashMap<>();
-        if(Objects.equals(account, "admin") && Objects.equals(password, "12345")){
-            map.put("token","afasfsafawsf");
+        if(Objects.equals(account, "admin")){
+            map.put("token", JwtHelper.createToken(sysUser.getId(), sysUser.getName()));
             map.put("identity","admin");
         }else {
-            map.put("token","sadqwrwqr");
+            map.put("token", JwtHelper.createToken(sysUser.getId(), sysUser.getName()));
             map.put("identity","user");
         }
         return Result.ok(map);
