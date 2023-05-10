@@ -1,23 +1,17 @@
 package edu.sustech.auth;
 
-import edu.sustech.auth.controller.SysGroupController;
-import edu.sustech.auth.mapper.SysRoleMapper;
 import edu.sustech.auth.service.SysApplicationService;
 import edu.sustech.auth.service.SysFundingService;
-import edu.sustech.auth.service.SysGroupService;
 import edu.sustech.auth.service.SysUserService;
-import edu.sustech.model.system.SysApplication;
+import edu.sustech.common.utils.MD5;
 import edu.sustech.model.system.SysFunding;
-import edu.sustech.model.system.SysRole;
 import edu.sustech.model.system.SysUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
-
 @SpringBootTest
-public class Test1 {
+public class Befor {
 
     @Autowired
     private SysApplicationService applicationService;
@@ -25,12 +19,22 @@ public class Test1 {
     private SysFundingService fundingService;
     @Autowired
     private SysUserService userService;
-    @Test
-    public void getAll() {
-        List<SysApplication> list = applicationService.selectAll();
-        System.out.println(list);
-    }
 
+
+    @Test
+    public void addAdmin(){
+        SysUser user = userService.getUserByName("admin");
+        if (user == null){
+            user.setName("admin");
+            user.setUid(1L);
+            String psw = "123456";
+            String passwordMd5 = MD5.encrypt(psw);
+            user.setPassword(passwordMd5);
+            boolean is_success = userService.save(user);
+            System.out.println(is_success);
+        }
+        System.out.println("create admin");
+    }
     @Test
     public void addFundings() {
         SysFunding funding = new SysFunding();

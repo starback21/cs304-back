@@ -18,4 +18,6 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     int selectUid(@Param("uid")Long uid);
 
     Long selectIdByName(@Param("name")String name);
+
+    int selectName(@Param("name")String name);
 }

@@ -11,6 +11,10 @@
         select count(uid) from sys_user where uid = #{uid}
     </select>
 
+    <select id="selectName" resultType="Integer">
+        select count(name) from sys_user where name = #{name}
+    </select>
+
     <select id="selectIdByName" resultType="Long">
         select id from sys_user where name = #{name}
     </select>
