@@ -109,4 +109,57 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
         return result;
     }
+
+    @Override
+    public void addUserToGroup(Long userId, List<String> groupList, List<String> adminList) {
+        SysUser user = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUid, userId));
+        SysUserRole role = new SysUserRole();
+        role.setUserId(user.getId());
+        role.setUserName(user.getName());
+
+        for (String gName : groupList){
+            boolean isAdmin = false;
+            role.setGroupName(gName);
+            Long gid = groupService.getIdByName(gName);
+            role.setGroupId(gid);
+            role.setRoleId(3);
+            if (adminList.size() > 0) {
+                for (String admin : adminList) {
+                    if (admin.equals(gName)){
+                        role.setRoleId(2);
+                        isAdmin = true;
+                    }
+                }
+            }
+            if (isAdmin) adminList.remove(gName);
+            roleService.save(role);
+        }
+    }
+
+    @Override
+    public void addUserToGroup(Long userId, List<String> groupList) {
+        SysUser user = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUid, userId));
+        SysUserRole role = new SysUserRole();
+        role.setUserId(user.getId());
+        role.setUserName(user.getName());
+        role.setRoleId(3);
+        for (String gName : groupList){
+            role.setGroupName(gName);
+            Long gid = groupService.getIdByName(gName);
+            role.setGroupId(gid);
+            roleService.save(role);
+        }
+    }
+
+    @Override
+    public List<String> getUserGroup(Long userId) {
+        List<SysUserRole> list = roleService.list(new LambdaQueryWrapper<SysUserRole>()
+                .eq(SysUserRole::getUserId,userId));
+        List<String> result = new ArrayList<>();
+        for (SysUserRole role : list){
+            String gName = role.getGroupName();
+            result.add(gName);
+        }
+        return result;
+    }
 }
