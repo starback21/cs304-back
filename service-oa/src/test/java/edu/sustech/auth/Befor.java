@@ -2,9 +2,12 @@ package edu.sustech.auth;
 
 import edu.sustech.auth.service.SysApplicationService;
 import edu.sustech.auth.service.SysFundingService;
+import edu.sustech.auth.service.SysGroupService;
 import edu.sustech.auth.service.SysUserService;
 import edu.sustech.common.utils.MD5;
+import edu.sustech.model.system.SysApplication;
 import edu.sustech.model.system.SysFunding;
+import edu.sustech.model.system.SysGroup;
 import edu.sustech.model.system.SysUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,8 @@ public class Befor {
     private SysFundingService fundingService;
     @Autowired
     private SysUserService userService;
+    @Autowired
+    private SysGroupService groupService;
 
 
     @Test
@@ -64,5 +69,17 @@ public class Befor {
             user.setEmail("163@qq.com");
             userService.save(user);
         }
+    }
+
+    @Test
+    public void addApplications(){
+        SysApplication application = new SysApplication();
+        application.setGroupId(3L);
+        application.setGroupName("计算机");
+        application.setNumber(1000);
+        application.setCategory1("eat");
+        application.setState("underway");
+        application.setTitle("吃喝");
+        applicationService.save(application);
     }
 }

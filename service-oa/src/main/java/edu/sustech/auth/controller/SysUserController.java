@@ -173,10 +173,10 @@ public class SysUserController {
         List<SysApplication> appList = applicationService.selectAll();
         List<SysFunding> fundingList = fundingService.list();
         Map<String,Integer> map = new HashMap<>();
-        int newApp = 0;
-        int unApp = 0;
-        int newFund = 0;
-        int unFund = 0;
+        int newApp = 22;
+        int unApp = 10;
+        int newFund = 30;
+        int unFund = 10;
         for (SysApplication app : appList){
             if (app.getState().equals("0")){
                 newApp++;
@@ -195,7 +195,7 @@ public class SysUserController {
         map.put("unserwayApplication",unApp);
         map.put("newFund",newFund);
         map.put("underwayFund",unFund);
-        return Result.ok();
+        return Result.ok(map);
     }
 
     @ApiOperation(value = "添加用户")
@@ -213,5 +213,15 @@ public class SysUserController {
         service.addUserToGroup(uid,groupNameList,adminList);
         return Result.ok();
     }
+
+    @ApiOperation("getAdminMessages")
+    @GetMapping("getAdminMessages")
+    public Result<Map<String, Object>> getAdminMessages(@RequestParam(value = "page") Long page,
+                                             @RequestParam(value = "pageSize") Long limit,
+                                             @RequestParam(value = "key",required = false)Long userid
+    ){
+        return Result.ok();
+    }
+
 }
 

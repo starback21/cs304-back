@@ -43,7 +43,8 @@ public class SysApplicationController {
 
     @ApiOperation(value = "获取申请")
     @GetMapping("/getApplications")
-    public Result<Map<String, Object>> getApplications(@RequestParam(value = "page") int page){
+    public Result<Map<String, Object>> getApplications(@RequestParam(value = "page") int page,
+                                                       @RequestParam(value = "type",required = false) String type){
         List<SysApplication> list = service.selectAll();
         List<PageApplication> data = new ArrayList<>();
         int index = 0;
@@ -54,8 +55,7 @@ public class SysApplicationController {
                 tmp.setId(Math.toIntExact(a.getId()));
                 tmp.setName(a.getTitle());
                 tmp.setState(a.getState());
-                String name = groupService.getById(a.getGroup()).getGroupName();
-                tmp.setGroup(name);
+                tmp.setGroup(a.getGroupName());
                 tmp.setNum(a.getNumber());
                 tmp.setDate(a.getCreateTime());
                 tmp.setPeople(a.getPeople());
