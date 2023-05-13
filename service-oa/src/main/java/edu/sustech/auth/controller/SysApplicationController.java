@@ -1,11 +1,17 @@
 package edu.sustech.auth.controller;
 
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import edu.sustech.auth.service.SysGroupService;
 import edu.sustech.model.system.SysApplication;
 import edu.sustech.auth.service.SysApplicationService;
 import edu.sustech.common.result.Result;
+import edu.sustech.model.system.SysUser;
 import edu.sustech.re.system.PageApplication;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,18 +40,28 @@ public class SysApplicationController {
     @Autowired
     private SysGroupService groupService;
 
-    @ApiOperation(value = "添加申请")
-    @PostMapping("/createApplication")
-    public Result save(@RequestBody JSONObject jsonParam){
-        System.out.println(jsonParam);
-        return Result.ok();
-    }
+
 
     @ApiOperation(value = "获取申请")
     @GetMapping("/getApplications")
     public Result<Map<String, Object>> getApplications(@RequestParam(value = "page") int page,
                                                        @RequestParam(value = "type",required = false) String type){
-        List<SysApplication> list = service.selectAll();
+//        List<SysApplication> list = service.selectAll();
+        List<SysApplication> list;
+        if (type != null){
+//            System.out.println("xxxxxxxxx   "+type);
+            if (type.equals("all")){
+                list = service.selectAll();
+            } else if (type.equals("underway")) {
+                LambdaQueryWrapper<SysApplication> wrapper = new LambdaQueryWrapper<>();
+                wrapper.eq(SysApplication::getState,"underway");
+                list = service.list(wrapper);
+            } else {
+                list = service.selectAll();
+            }
+        }else {
+            list = service.selectAll();
+        }
         List<PageApplication> data = new ArrayList<>();
         int index = 0;
         for (SysApplication a : list){
@@ -74,16 +90,31 @@ public class SysApplicationController {
     @PostMapping("/permitApplication")
     public Result permitApplication(@RequestBody JSONObject jsonParam){
         Long id = jsonParam.getLong("id");
-
-        return Result.ok();
+        UpdateWrapper<SysApplication> wrapper = new UpdateWrapper<>();
+        wrapper.eq("id",id).set("state","completed");
+        boolean is_success = service.update(wrapper);
+        if (is_success)
+            return Result.ok();
+        else
+            return Result.fail();
     }
 
-    @ApiOperation("通过申请")
+    @ApiOperation("拒绝申请")
     @PostMapping("/denyApplications")
     public Result denyApplications(@RequestBody JSONObject jsonParam){
-        Long id = jsonParam.getLong("id");
-
-        return Result.ok();
+        JSONArray data = jsonParam.getJSONArray("ids");
+        String js = JSONObject.toJSONString(data, SerializerFeature.WriteClassName);
+        List<Long> idList = JSONObject.parseArray(js, Long.class);
+        boolean is_success = false;
+        UpdateWrapper<SysApplication> wrapper = new UpdateWrapper<>();
+        for (Long id : idList){
+            wrapper.eq("id",id).set("state","reject");
+            is_success = service.update(wrapper);
+        }
+        if (is_success)
+            return Result.ok();
+        else
+            return Result.fail();
     }
 }
 
