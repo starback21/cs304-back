@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * 用于返回分页查询中的user
  *与前端数据一致
@@ -21,4 +23,5 @@ public class PageUser {
     String email;
     String phone;
     Boolean admin = false;
+    List<String> group;
 }
