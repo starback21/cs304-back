@@ -5,12 +5,10 @@ import edu.sustech.model.base.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
 @Data
-@ApiModel(description = "经费表")
-@TableName("sys_funding")
-public class SysFunding extends BaseEntity {
-
+@ApiModel(description = "组经费表")
+@TableName("sys_group_funding")
+public class SysGroupFund extends BaseEntity{
     @ApiModelProperty(value = "经费id")
     @TableField("funding_id")
     private Long fundingId;
@@ -26,20 +24,13 @@ public class SysFunding extends BaseEntity {
     @ApiModelProperty(value = "总金额")
     @TableField("total_amount")
     private Long totalAmount;
-    @ApiModelProperty(value = "花费金额")
+    @ApiModelProperty(value = "花费")
     @TableField("cost")
     private Long cost;
-    @ApiModelProperty(value = "剩余金额")
+    @ApiModelProperty(value = "剩余")
     @TableField("remain_amount ")
     private Long remainAmount;
-    @ApiModelProperty(value = "经费状态")
+    @ApiModelProperty(value="达标")
     @TableField("status")
     private String status;
-    @ApiModelProperty(value = "开始时间")
-    @TableField("start_time")
-    private String startTime;
-    @ApiModelProperty(value = "结束时间")
-    @TableField("end_time")
-    private String endTime;
-
 }
