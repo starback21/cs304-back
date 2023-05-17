@@ -34,9 +34,13 @@ public class SysApplication extends BaseEntity {
     @TableField("title")
     private String title;
 
-    @ApiModelProperty(value = "组")
-    @TableField("group")
-    private Long group;
+    @ApiModelProperty(value = "组id")
+    @TableField("group_id")
+    private Long groupId;
+
+    @ApiModelProperty(value = "组名")
+    @TableField("group_name")
+    private String groupName;
 
     @ApiModelProperty(value = "类1")
     @TableField("category1")

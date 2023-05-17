@@ -67,10 +67,11 @@ drop table if exists sys_application;
 CREATE TABLE `sys_application` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `title` varchar(50) NOT NULL DEFAULT '' COMMENT '标题',
-  `group` bigint(20) NOT NULL DEFAULT '0' COMMENT '组id',
+  `group_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '组id',
+  `group_name` varchar(20) NOT NULL DEFAULT '' COMMENT '组名',
   `category1` varchar(30) NOT NULL DEFAULT '' COMMENT '类别1',
   `category2` varchar(30) NOT NULL DEFAULT '' COMMENT '类别2',
-  `number` int(5) NOT NULL DEFAULT '0' COMMENT '数量',
+  `number` int(5) NOT NULL DEFAULT 0 COMMENT '数量',
   `state` varchar(30) NOT NULL DEFAULT '' COMMENT '状态',
   `people` varchar(20) NOT NULL DEFAULT '' COMMENT '处理人',
   `comment` varchar(100) NOT NULL DEFAULT '' COMMENT '评价',
@@ -78,7 +79,7 @@ CREATE TABLE `sys_application` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:可用 1:不可用）',
   PRIMARY KEY (`id`),
-  KEY `idx_group_id` (`group`)
+  KEY `idx_group_id` (`group_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='申请';
 
 drop table if exists sys_funding;

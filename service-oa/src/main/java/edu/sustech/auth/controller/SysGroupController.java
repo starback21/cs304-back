@@ -226,16 +226,6 @@ public class SysGroupController {
         }
     }
 
-//    @ApiOperation(value = "根据id列表删除")
-//    @DeleteMapping("/batchRemove")
-//    public Result batchRemove(@RequestBody List<Long> idList) {
-//        boolean is_success = sysGroupService.removeByIds(idList);
-//        if (is_success){
-//            return Result.ok();
-//        }else {
-//            return Result.fail();
-//        }
-//    }
     @ApiOperation(value = "添加用户到课题组")
     @PostMapping("/addGroupUsers")
     public Result addGroupUsers(@RequestBody JSONObject jsonParam){
@@ -274,6 +264,21 @@ public class SysGroupController {
         Long groupId = sysGroupService.getIdByName(name);
         List<PageUser> list = sysGroupService.getUsersNotInGroup(groupId);
         return Result.ok(list);
+    }
+
+    @ApiOperation(value = "获取组数据")
+    @GetMapping("getGroupStatistics")
+    public Result<Map<String,Object>> getGroupStatistics(@RequestParam(value = "groupId") String id){
+        Map<String,Object> result = new HashMap<>();
+        SysGroup group = sysGroupService.getById(id);
+        result.put("name",group.getGroupName());
+        result.put("memberNum", 3);
+        result.put("totalFund", 10);
+        result.put("usedFund", 2);
+        result.put("leftFund", 8);
+        result.put("completeRate", 20);
+        result.put("complete", true);
+        return Result.ok(result);
     }
 }
 
