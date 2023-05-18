@@ -5,6 +5,7 @@ import edu.sustech.auth.service.SysUserRoleService;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.*;
 import edu.sustech.re.system.PageFund;
+import edu.sustech.re.system.PageGroup;
 import edu.sustech.re.system.PageGroupFund;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +29,8 @@ public class SysFundingController {
     private SysUserRoleService sysUserRoleService;
     @Autowired
     private SysGroupFundDetailService sysGroupFundDetailService;
+    @Autowired
+    private SysUserService sysUserService;
     @ApiOperation(value = "获取所有经费")
     @GetMapping("getFunds")
     public Result getFunds() {
@@ -315,8 +318,9 @@ public class SysFundingController {
     @PostMapping ("modifyGroupFundDetail")
     public Result modifyGroupFundDetail(@RequestBody Map<String, Object> fundDetail) {
         String groupId = fundDetail.get("groupId").toString();
-        String fundingId = fundDetail.get("fundingId").toString();
+        String fundingId = fundDetail.get("fundId").toString();
         List<Map<Object,Object>>FUNDDETAIL= (List<Map<Object, Object>>) fundDetail.get("detail");
+        System.out.println(FUNDDETAIL);
         List<SysGroupFundDetail> sysGroupFundDetails = sysGroupFundDetailService.list();
         List<SysGroupFundDetail> sysGroupFundDetails1 = new ArrayList<>();
 
@@ -351,9 +355,9 @@ public class SysFundingController {
             String cost = map.get("cost").toString();
             String left = map.get("left").toString();
             String new1 = map.get("new").toString();
-            if(new1.equals("True")){
+            if(new1.equals("true")){
                 SysGroupFundDetail sysGroupFundDetail = new SysGroupFundDetail();
-                sysGroupFundDetail.setGroupId((long) Integer.parseInt(groupId));
+                sysGroupFundDetail.setGroupId(sysGroupFund.getGroupId());
                 sysGroupFundDetail.setFundingId((long) Integer.parseInt(fundingId));
                 sysGroupFundDetail.setCategory1(category1);
                 sysGroupFundDetail.setCategory2(category2);
@@ -382,6 +386,7 @@ public class SysFundingController {
         sysFunding.setRemainAmount(sysFunding.getTotalAmount()-sysFunding.getCost());
         sysFundingService.updateById(sysFunding);
         List<Map<String,String>>result = new ArrayList<>();
+        sysGroupFundDetails = sysGroupFundDetailService.list();
         for(SysGroupFundDetail sysGroupFundDetail:sysGroupFundDetails){
             if(sysGroupFundDetail.getGroupId().equals(sysGroupFund.getGroupId())&&sysGroupFundDetail.getFundingId().toString().equals(fundingId)){
                 Map<String,String>map = new HashMap<>();
@@ -400,6 +405,7 @@ public class SysFundingController {
     @ApiOperation(value = "根据id获取、经费信息")
     @GetMapping("getFundStatistics")
     private Result getFundStatistics(@RequestParam(value = "id",required = false) Long fundId){
+        System.out.println("调用获取经费信息接口");
         List<SysFunding> sysFundings = sysFundingService.list();
         Map<String,Object>result = new HashMap<>();
         for(SysFunding sysFunding:sysFundings){
@@ -410,15 +416,82 @@ public class SysFundingController {
                 result.put("used",sysFunding.getCost().toString());
                 result.put("completeRate", sysFunding.getCost()*100/sysFunding.getTotalAmount());
                 if(sysFunding.getStatus().equals("complete")){
-                    result.put("complete",true);
+                    result.put("complete","True");
                 }else{
-                    result.put("complete",false);
+                    result.put("complete","False");
                 }
                 break;
             }
         }
+        System.out.println(result);
         return Result.ok(result);
     }
+    @ApiOperation(value = "根据用户id获取课题组")
+    @GetMapping("getUserGroups")
+    public Result<List<Map<Object,Object>>> getUserGroups(@RequestParam(value = "userId") Long userId){
+        List<SysUserRole>sysUserRoles = sysUserRoleService.list();
+        List<SysGroupFund>sysGroupFunds = sysGroupFundService.list();
+        List<SysUser>sysUsers = sysUserService.list();
+        List<SysUserRole>sysUserRoles1 = new ArrayList<>();
+        for(SysUserRole sysUserRole:sysUserRoles){
+            if(sysUserRole.getUserId().equals(userId)){
+                sysUserRoles1.add(sysUserRole);
+            }
+        }
+        List<Long>groupIds = new ArrayList<>();
+        for(SysUserRole sysUserRole:sysUserRoles1){
+            if (!groupIds.contains(sysUserRole.getGroupId())){
+                groupIds.add(sysUserRole.getGroupId());
+            }
+        }
+        List<Map<Object,Object>>users= new ArrayList<>();
+        for(SysUserRole sysUserRole:sysUserRoles){
+            Map<Object,Object>map = new HashMap<>();
+            if(groupIds.contains(sysUserRole.getGroupId())){
+                map.put("userId",sysUserRole.getUserId());
+                map.put("admin",sysUserRole.getRoleId());
+                map.put("groupId",sysUserRole.getGroupId());
+                users.add(map);
+            }
+        }
+        List<Map<Object,Object>>usernames= new ArrayList<>();
+        for(Map<Object,Object>user:users){
+            for(SysUser sysUser:sysUsers){
+                if(user.get("userId").equals(sysUser.getId())){
+                    Map<Object,Object>map = new HashMap<>();
+                    map.put("username",sysUser.getName());
+                    map.put("admin",user.get("admin"));
+                    map.put("groupId",user.get("groupId"));
+                    usernames.add(map);
+                    break;
+                }
+            }
+        }
+        List<Map<Object,Object>>result = new ArrayList<>();
+        for(Long groupId:groupIds){
+            for(SysGroupFund sysGroupFund:sysGroupFunds){
+                if(sysGroupFund.getGroupId().equals(groupId)){
+                    Map<Object,Object>map = new HashMap<>();
+                    map.put("id",sysGroupFund.getGroupId());
+                    map.put("name",sysGroupFund.getGroupName());
+                    map.put("total",sysGroupFund.getTotalAmount());
+                    map.put("left",sysGroupFund.getRemainAmount());
+                    Map<String,String>user = new HashMap<>();
+                    for(Map<Object,Object>user1:usernames){
+                        if(user1.get("groupId").equals(groupId)){
+                            user.put("name",user1.get("username").toString());
+                            if(user1.get("admin").toString().equals("1")) {user.put("admin","True");}
+                            else {user.put("admin","False");}
+                        }
+                    }
+                    map.put("users",user);
+                    result.add(map);
+                }
+            }
+        }
+        return Result.ok(result);
+    }
+
 
 
 

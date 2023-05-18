@@ -17,12 +17,6 @@ public class SysFunding extends BaseEntity {
     @ApiModelProperty(value = "经费名称")
     @TableField("funding_name")
     private String fundingName;
-    @ApiModelProperty(value = "课题组id")
-    @TableField("group_id")
-    private Long groupId;
-    @ApiModelProperty(value = "课题组名称")
-    @TableField("group_name")
-    private String groupName;
     @ApiModelProperty(value = "总金额")
     @TableField("total_amount")
     private Long totalAmount;
