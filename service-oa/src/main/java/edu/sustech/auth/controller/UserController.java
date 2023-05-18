@@ -1,16 +1,21 @@
 package edu.sustech.auth.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import edu.sustech.auth.service.SysApplicationService;
 import edu.sustech.auth.service.SysGroupService;
 import edu.sustech.common.handler.SpecialException;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.SysApplication;
+import edu.sustech.model.system.SysUser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Map;
 
 @Api(tags = "后台登录管理")
@@ -27,6 +32,21 @@ public class UserController {
     public Result cancelApplication(@RequestBody JSONObject jsonParam){
         Long id = jsonParam.getLong("id");
         boolean is_success = applicationService.removeById(id);
+        if (is_success)
+            return Result.ok();
+        else
+            return Result.fail();
+    }
+
+    @ApiOperation(value = "删除申请")
+    @PostMapping("/batchCancelApplication")
+    public Result batchCancelApplication(@RequestBody JSONObject jsonParam){
+        JSONArray data = jsonParam.getJSONArray("ids");
+        String js = JSONObject.toJSONString(data, SerializerFeature.WriteClassName);
+        List<Long> idList = JSONObject.parseArray(js, Long.class);
+        QueryWrapper<SysApplication> wrapper = new QueryWrapper<>();
+        wrapper.in("id",idList);
+        boolean is_success = applicationService.remove(wrapper);
         if (is_success)
             return Result.ok();
         else

@@ -18,7 +18,6 @@ public class JwtHelper {
                 //设置主体
                 .claim("userId", userId)
                 .claim("username", username)
-
                 .signWith(SignatureAlgorithm.HS512, tokenSignKey)
                 .compressWith(CompressionCodecs.GZIP)
                 .compact();

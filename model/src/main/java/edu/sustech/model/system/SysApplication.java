@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import edu.sustech.model.base.BaseEntity;
@@ -66,6 +67,8 @@ public class SysApplication extends BaseEntity {
     @TableField("comment")
     private String comment;
 
+    @TableField("change_time")
+    private Date changeTime;
 
 
 }

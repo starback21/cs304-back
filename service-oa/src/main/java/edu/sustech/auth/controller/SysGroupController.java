@@ -99,7 +99,7 @@ public class SysGroupController {
     }
     @ApiOperation(value = "分页获取课题组数据")
     @GetMapping("/getGroups")
-    public Result<Map<String, Object>> getGroups(@RequestParam(value = "page") Long page,
+    public Result<Map<String, Object>> getGroups(@RequestParam(value = "page") int page,
                                  @RequestParam(value = "pageSize") Long limit,
                                 @RequestParam(value = "id",required = false)Long groupid){
         Map<String,Object> objectMap = new HashMap<>(2);
@@ -271,8 +271,9 @@ public class SysGroupController {
     public Result<Map<String,Object>> getGroupStatistics(@RequestParam(value = "groupId") String id){
         Map<String,Object> result = new HashMap<>();
         SysGroup group = sysGroupService.getById(id);
+        int memberNum = userRoleService.count(new QueryWrapper<SysUserRole>().eq("group_id",id));
         result.put("name",group.getGroupName());
-        result.put("memberNum", 3);
+        result.put("memberNum", memberNum);
         result.put("totalFund", 10);
         result.put("usedFund", 2);
         result.put("leftFund", 8);

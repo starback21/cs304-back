@@ -47,10 +47,10 @@ public class LoginController {
 
         Map<String, Object> map = new HashMap<>();
         if(Objects.equals(account, "admin")){
-            map.put("token", JwtHelper.createToken(sysUser.getId(), sysUser.getName()));
+            map.put("token", "qwefqwadf");
             map.put("identity","admin");
         }else {
-            map.put("token", JwtHelper.createToken(sysUser.getId(), sysUser.getName()));
+            map.put("token", "asdaccas");
             map.put("identity","user");
         }
         return Result.ok(map);

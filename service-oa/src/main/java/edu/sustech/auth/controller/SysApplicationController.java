@@ -18,10 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -46,10 +43,9 @@ public class SysApplicationController {
     @GetMapping("/getApplications")
     public Result<Map<String, Object>> getApplications(@RequestParam(value = "page") int page,
                                                        @RequestParam(value = "type",required = false) String type){
-//        List<SysApplication> list = service.selectAll();
+
         List<SysApplication> list;
         if (type != null){
-//            System.out.println("xxxxxxxxx   "+type);
             if (type.equals("all")){
                 list = service.selectAll();
             } else if (type.equals("underway")) {
@@ -91,7 +87,8 @@ public class SysApplicationController {
     public Result permitApplication(@RequestBody JSONObject jsonParam){
         Long id = jsonParam.getLong("id");
         UpdateWrapper<SysApplication> wrapper = new UpdateWrapper<>();
-        wrapper.eq("id",id).set("state","completed");
+        Date date = new Date(System.currentTimeMillis());
+        wrapper.eq("id",id).set("state","completed").set("change_time",date);
         boolean is_success = service.update(wrapper);
         if (is_success)
             return Result.ok();
@@ -107,8 +104,9 @@ public class SysApplicationController {
         List<Long> idList = JSONObject.parseArray(js, Long.class);
         boolean is_success = false;
         UpdateWrapper<SysApplication> wrapper = new UpdateWrapper<>();
+        Date date = new Date(System.currentTimeMillis());
         for (Long id : idList){
-            wrapper.eq("id",id).set("state","reject");
+            wrapper.eq("id",id).set("state","reject").set("change_time",date);
             is_success = service.update(wrapper);
         }
         if (is_success)
@@ -116,5 +114,44 @@ public class SysApplicationController {
         else
             return Result.fail();
     }
+
+    @ApiOperation(value = "获取申请详细信息")
+    @GetMapping("/getApplicationInfo")
+    public Result<Map<String, Object>> getApplicationInfo(@RequestParam(value = "id") int id) {
+        SysApplication app = service.getById(id);
+        Long groupId = app.getGroupId();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("applicationId",id);
+        result.put("fundId",1);
+        result.put("fundName","fund1");
+        result.put("groupName",app.getGroupName());
+        result.put("groupTotalFund",100);
+        result.put("groupUsedFund",20);
+        result.put("people","xxx");
+        result.put("category1",app.getCategory1());
+        result.put("category2",app.getCategory2());
+        result.put("useNum",30);
+        result.put("summary",app.getComment());
+        result.put("comment",app.getComment());
+
+        return  Result.ok(result);
+    }
+
+    @ApiOperation(value = "获取申请时间线")
+    @GetMapping("/getApplicationTimeline")
+    public Result<Map<String, Object>> getApplicationTimeline(@RequestParam(value = "fundId") int fundId) {
+        SysApplication app = service.getById(fundId);
+        Date date1 = app.getCreateTime();
+        Date date2 = app.getChangeTime();
+        String state = app.getState();
+        Map<String, Object> result = new HashMap<>();
+        result.put("date1",date1);
+        result.put("date2",date2);
+        result.put("state",state);
+
+        return  Result.ok(result);
+    }
+
 }
 

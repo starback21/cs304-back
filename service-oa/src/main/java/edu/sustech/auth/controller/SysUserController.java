@@ -14,6 +14,8 @@ import edu.sustech.common.utils.MD5;
 import edu.sustech.model.system.SysApplication;
 import edu.sustech.model.system.SysFunding;
 
+import edu.sustech.re.system.PageApplication;
+import edu.sustech.re.system.PageMsg;
 import edu.sustech.re.system.PageUser;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.SysUser;
@@ -93,16 +95,6 @@ public class SysUserController {
 
     }
 
-
-    @ApiOperation(value = "根据id获取用户")
-    @GetMapping("/get/{id}")
-    public Result<SysUser> get(@PathVariable Long id) {
-        SysUser user = service.getById(id);
-        if (user == null){
-            return Result.fail();
-        }
-        return Result.ok(user);
-    }
     @ApiOperation("查询所有用户名字")
     @GetMapping("/getAllAccountName")
     public Result<List<String>> getAllAccountName() {
@@ -178,9 +170,7 @@ public class SysUserController {
         int newFund = 30;
         int unFund = 10;
         for (SysApplication app : appList){
-            if (app.getState().equals("0")){
-                newApp++;
-            }else {
+            if (app.getState().equals("underway")){
                 unApp++;
             }
         }
@@ -216,11 +206,81 @@ public class SysUserController {
 
     @ApiOperation("getAdminMessages")
     @GetMapping("getAdminMessages")
-    public Result<Map<String, Object>> getAdminMessages(@RequestParam(value = "page") Long page,
-                                             @RequestParam(value = "pageSize") Long limit,
-                                             @RequestParam(value = "key",required = false)Long userid
+    public Result<Map<String ,Object>> getAdminMessages(@RequestParam(value = "page") int page,
+                                             @RequestParam(value = "type",required = false)String  type
     ){
-        return Result.ok();
+
+//        int index = 0;
+//        for (){
+//            index++;
+//            if (index > (page - 1) * 4 && index <= page * 4){
+//
+//            }
+//        }
+        List<PageMsg> result_list = new ArrayList<>();
+        PageMsg msg = new PageMsg();
+        msg.setType("系统通知");
+        msg.setDate(new Date());
+        msg.setNewComing(true);
+        msg.setMsg("1test msg api");
+        Map<String,Object> resul = new HashMap<>(2);
+        resul.put("data",result_list);
+        resul.put("total",result_list.size());
+        return Result.ok(resul);
+    }
+
+    @ApiOperation("getAdminMessages")
+    @GetMapping("getUserMessages")
+    public Result<Map<String ,Object>> getUserMessages(@RequestParam(value = "page") int page,
+                                                        @RequestParam(value = "type",required = false)String  type
+    ){
+
+//        int index = 0;
+//        for (){
+//            index++;
+//            if (index > (page - 1) * 4 && index <= page * 4){
+//
+//            }
+//        }
+        List<PageMsg> result_list = new ArrayList<>();
+        PageMsg msg = new PageMsg();
+        msg.setType("系统通知");
+        msg.setDate(new Date());
+        msg.setNewComing(true);
+        msg.setMsg("1test msg api");
+        Map<String,Object> resul = new HashMap<>(2);
+        resul.put("data",result_list);
+        resul.put("total",result_list.size());
+        return Result.ok(resul);
+    }
+
+    @ApiOperation(value = "获取管理员主页数据")
+    @GetMapping("/getUserHomeStatistics")
+    public Result<Map<String,Integer>> getUserHomeStatistics(){
+        List<SysApplication> appList = applicationService.selectAll();
+        List<SysFunding> fundingList = fundingService.list();
+        Map<String,Integer> map = new HashMap<>();
+        int newApp = 22;
+        int unApp = 10;
+        int newFund = 30;
+        int unFund = 10;
+        for (SysApplication app : appList){
+            if (app.getState().equals("underway")){
+                unApp++;
+            }
+        }
+        for (SysFunding f : fundingList){
+            if (f.getStatus().equals("completed")){
+                unFund++;
+            }else {
+                newFund++;
+            }
+        }
+        map.put("newApplication",newApp);
+        map.put("unserwayApplication",unApp);
+        map.put("newFund",newFund);
+        map.put("underwayFund",unFund);
+        return Result.ok(map);
     }
 
 }

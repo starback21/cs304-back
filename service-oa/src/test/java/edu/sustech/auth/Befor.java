@@ -1,17 +1,16 @@
 package edu.sustech.auth;
 
-import edu.sustech.auth.service.SysApplicationService;
-import edu.sustech.auth.service.SysFundingService;
-import edu.sustech.auth.service.SysGroupService;
-import edu.sustech.auth.service.SysUserService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import edu.sustech.auth.service.*;
 import edu.sustech.common.utils.MD5;
-import edu.sustech.model.system.SysApplication;
-import edu.sustech.model.system.SysFunding;
-import edu.sustech.model.system.SysGroup;
-import edu.sustech.model.system.SysUser;
+import edu.sustech.model.system.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @SpringBootTest
 public class Befor {
@@ -24,7 +23,8 @@ public class Befor {
     private SysUserService userService;
     @Autowired
     private SysGroupService groupService;
-
+    @Autowired
+    private SysUserRoleService roleService;
 
     @Test
     public void addAdmin(){
@@ -81,5 +81,24 @@ public class Befor {
         application.setState("underway");
         application.setTitle("吃喝");
         applicationService.save(application);
+    }
+
+    @Test
+    public void changeApplications(){
+        SysApplication application = applicationService.getById(1);
+        application.setState("complete");
+        Date date = new Date(System.currentTimeMillis());
+        application.setChangeTime(date);
+        UpdateWrapper<SysApplication> wrapper = new UpdateWrapper<>();
+        wrapper.eq("id",1).set("state","complete").set("change_time",date);
+        applicationService.update(wrapper);
+
+    }
+
+    @Test
+    public void test1(){
+
+        int memberNum = roleService.count(new QueryWrapper<SysUserRole>().eq("group_id",3));
+        System.out.println(memberNum);
     }
 }
