@@ -161,12 +161,15 @@ public class SysApplicationController {
                 sysGroupFundDetail.setTotalAmount(sysGroupFundDetail.getTotalAmount()-Long.valueOf(app.getNumber()));
                 sysGroupFundDetail.setRemainAmount(sysGroupFundDetail.getTotalAmount()-sysGroupFundDetail.getUsedAmount());
                 groupFundDetailService.updateById(sysGroupFundDetail);
+                groupFund.setTotalAmount(groupFund.getTotalAmount()-app.getNumber());
+                groupFund.setRemainAmount(groupFund.getRemainAmount()-app.getNumber());
                 groupFund.setTotalAmount(groupFund.getTotalAmount() - Long.valueOf(app.getNumber()));
                 groupFundService.updateById(groupFund);
                 funding.setCost(funding.getCost() - Long.valueOf(app.getNumber()));
                 funding.setRemainAmount(funding.getTotalAmount() - funding.getCost());
                 fundingService.updateById(funding);
             }
+
         }
 
         if (is_success)
