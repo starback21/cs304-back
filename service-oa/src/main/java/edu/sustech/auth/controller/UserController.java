@@ -9,10 +9,7 @@ import edu.sustech.auth.service.*;
 import edu.sustech.common.handler.SpecialException;
 import edu.sustech.common.jwt.JwtHelper;
 import edu.sustech.common.result.Result;
-import edu.sustech.model.system.SysApplication;
-import edu.sustech.model.system.SysGroupFund;
-import edu.sustech.model.system.SysUser;
-import edu.sustech.model.system.SysUserRole;
+import edu.sustech.model.system.*;
 import edu.sustech.re.system.PageApplication;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,9 +32,15 @@ public class UserController {
     @Autowired
     SysUserService userService;
     @Autowired
-    private SysUserRoleService sysUserRoleService;
+    SysFundAppService fundAppService;
     @Autowired
-    private SysGroupFundService groupFundService;
+    SysFundingService fundingService;
+    @Autowired
+    SysGroupFundDetailService groupFundDetailService;
+    @Autowired
+    SysGroupFundService groupFundService;
+    @Autowired
+    private SysUserRoleService sysUserRoleService;
 
     @ApiOperation(value = "删除申请")
     @PostMapping("/cancelApplication")
@@ -97,6 +100,27 @@ public class UserController {
         application.setCategory2(c2);
         application.setComment(comment);
         applicationService.save(application);
+        QueryWrapper<SysApplication> queryWrapper = new QueryWrapper<>();
+        SysApplication appli=applicationService.getOne(queryWrapper.last("limit 1"));;
+        Long fundId = fundAppService.getByAppId(appli.getId()).getFundId();
+        SysGroupFundDetail sysGroupFundDetail=groupFundDetailService.getByGroupCategory(c1,c2,fundId, id);
+        if (sysGroupFundDetail==null){
+            SysGroupFundDetail sysGroupFundDetail1=new SysGroupFundDetail();
+            sysGroupFundDetail1.setFundingId(fundId);
+            sysGroupFundDetail1.setGroupId(id);
+            sysGroupFundDetail1.setCategory1(c1);
+            sysGroupFundDetail1.setCategory2(c2);
+            sysGroupFundDetail1.setTotalAmount((long) num);
+            sysGroupFundDetail1.setUsedAmount((long) 0);
+            sysGroupFundDetail1.setRemainAmount((long) num);
+            groupFundDetailService.save(sysGroupFundDetail1);
+
+        }else{
+            sysGroupFundDetail.setTotalAmount(sysGroupFundDetail.getTotalAmount()+num);
+            sysGroupFundDetail.setRemainAmount(sysGroupFundDetail.getRemainAmount()+num);
+            groupFundDetailService.updateById(sysGroupFundDetail);
+        }
+
         return Result.ok();
     }
 
