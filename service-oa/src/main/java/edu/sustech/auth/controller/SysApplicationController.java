@@ -107,21 +107,31 @@ public class SysApplicationController {
         SysFundApp fundApp = fundAppService.getByAppId(id);
         SysGroupFund groupFund = groupFundService.getById(groupId);
         SysFunding funding = fundingService.getById(fundApp.getFundId());
-        SysGroupFundDetail groupFundDetail = new SysGroupFundDetail();
-        groupFundDetail.setGroupId(groupId);
-        groupFundDetail.setFundingId(fundApp.getFundId());
-        groupFundDetail.setTotalAmount(Long.valueOf(app.getNumber()));
-        groupFundDetail.setUsedAmount(Long.valueOf(app.getNumber()));
-        groupFundDetail.setCategory1(app.getCategory1());
-        groupFundDetail.setCategory2(app.getCategory2());
-        groupFundDetailService.save(groupFundDetail);
-        groupFund.setTotalAmount(groupFund.getTotalAmount() + Long.valueOf(app.getNumber()));
+        QueryWrapper<SysGroupFundDetail> queryWrapper = new QueryWrapper<>();
+        SysGroupFundDetail sysGroupFundDetail=groupFundDetailService.getByGroupCategory(app.getCategory1(),app.getCategory2(),fundApp.getFundId(), app.getGroupId());
+        if(sysGroupFundDetail!=null){
+            sysGroupFundDetail.setUsedAmount(sysGroupFundDetail.getUsedAmount()+Long.valueOf(app.getNumber()));
+            sysGroupFundDetail.setRemainAmount(sysGroupFundDetail.getTotalAmount()-sysGroupFundDetail.getUsedAmount());
+            groupFundDetailService.updateById(sysGroupFundDetail);
+        }
+
+//        groupFundDetail.setGroupId(groupId);
+//        groupFundDetail.setFundingId(fundApp.getFundId());
+//        groupFundDetail.setTotalAmount(Long.valueOf(app.getNumber()));
+//        groupFundDetail.setUsedAmount(Long.valueOf(app.getNumber()));
+//        groupFundDetail.setCategory1(app.getCategory1());
+//        groupFundDetail.setCategory2(app.getCategory2());
+//        groupFundDetailService.save(groupFundDetail);
+//        groupFund.setTotalAmount(groupFund.getTotalAmount() + Long.valueOf(app.getNumber()));
+//        groupFund.setCost(groupFund.getCost() + Long.valueOf(app.getNumber()));
+//        groupFund.setRemainAmount(groupFund.getTotalAmount() - groupFund.getCost());
+//        groupFundService.updateById(groupFund);
+//        funding.setCost(funding.getCost() + Long.valueOf(app.getNumber()));
+//        funding.setRemainAmount(funding.getTotalAmount() - funding.getCost());
+//        fundingService.updateById(funding);
         groupFund.setCost(groupFund.getCost() + Long.valueOf(app.getNumber()));
         groupFund.setRemainAmount(groupFund.getTotalAmount() - groupFund.getCost());
         groupFundService.updateById(groupFund);
-        funding.setCost(funding.getCost() + Long.valueOf(app.getNumber()));
-        funding.setRemainAmount(funding.getTotalAmount() - funding.getCost());
-        fundingService.updateById(funding);
         if (is_success)
             return Result.ok();
         else

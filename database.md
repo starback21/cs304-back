@@ -137,6 +137,7 @@ CREATE TABLE sys_group_funding_detail (
   group_id INT NOT NULL default '114514' COMMENT '课题组id',
   total_amount DECIMAL(10, 2) NOT NULL default '9999999'COMMENT '总经费',
    `used_amount`  DECIMAL(10, 2) NOT NULL default 0 COMMENT '花费',
+    `remain_amount` DECIMAL(10, 2) default 9999 NOT NULL COMMENT '剩余经费',
    category1 VARCHAR(50) default 'test'COMMENT '一级分类',
     category2 VARCHAR(50) default'test1'  COMMENT '二级分类',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
