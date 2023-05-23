@@ -10,4 +10,9 @@ import org.springframework.stereotype.Service;
 @Service
 
 public class SysGroupFundServiceImpl extends ServiceImpl<SysGroupFundMapper, SysGroupFund> implements SysGroupFundService {
+
+        @Override
+        public SysGroupFund getByGroupId(Long groupId) {
+            return this.getOne(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<SysGroupFund>().eq(SysGroupFund::getGroupId,groupId));
+        }
 }

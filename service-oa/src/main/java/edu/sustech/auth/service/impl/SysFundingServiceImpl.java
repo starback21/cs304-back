@@ -10,5 +10,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class SysFundingServiceImpl extends ServiceImpl<SysFundingMapper, SysFunding> implements SysFundingService {
 
+        @Override
+        public SysFunding getByFundingId(Long fundingId) {
+            return this.getOne(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<SysFunding>().eq(SysFunding::getFundingId,fundingId));
+        }
+
 }
 

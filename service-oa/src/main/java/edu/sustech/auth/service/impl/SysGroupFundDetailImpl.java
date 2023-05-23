@@ -10,4 +10,5 @@ import org.springframework.stereotype.Service;
 @Service
 
 public class SysGroupFundDetailImpl extends ServiceImpl<SysGroupFundDetailMapper, SysGroupFundDetail> implements SysGroupFundDetailService {
+
 }

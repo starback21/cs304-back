@@ -8,10 +8,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import edu.sustech.auth.service.SysGroupService;
-import edu.sustech.model.system.SysApplication;
+import edu.sustech.model.system.*;
+import edu.sustech.auth.service.SysGroupFundDetailService;
+import edu.sustech.auth.service.SysGroupFundService;
+import edu.sustech.auth.service.SysFundingService;
+import edu.sustech.auth.service.SysFundAppService;
 import edu.sustech.auth.service.SysApplicationService;
 import edu.sustech.common.result.Result;
-import edu.sustech.model.system.SysUser;
 import edu.sustech.re.system.PageApplication;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,6 +39,14 @@ public class SysApplicationController {
     private SysApplicationService service;
     @Autowired
     private SysGroupService groupService;
+    @Autowired
+    private SysFundAppService fundAppService;
+    @Autowired
+    private SysGroupFundService groupFundService;
+    @Autowired
+    private SysGroupFundDetailService groupFundDetailService;
+    @Autowired
+    private SysFundingService fundingService;
 
 
 
@@ -91,6 +102,26 @@ public class SysApplicationController {
         Date date = new Date(System.currentTimeMillis());
         wrapper.eq("id",id).set("state","completed").set("change_time",date);
         boolean is_success = service.update(wrapper);
+        SysApplication app = service.getById(id);
+        Long groupId = app.getGroupId();
+        SysFundApp fundApp = fundAppService.getByAppId(id);
+        SysGroupFund groupFund = groupFundService.getById(groupId);
+        SysFunding funding = fundingService.getById(fundApp.getFundId());
+        SysGroupFundDetail groupFundDetail = new SysGroupFundDetail();
+        groupFundDetail.setGroupId(groupId);
+        groupFundDetail.setFundingId(fundApp.getFundId());
+        groupFundDetail.setTotalAmount(Long.valueOf(app.getNumber()));
+        groupFundDetail.setUsedAmount(Long.valueOf(app.getNumber()));
+        groupFundDetail.setCategory1(app.getCategory1());
+        groupFundDetail.setCategory2(app.getCategory2());
+        groupFundDetailService.save(groupFundDetail);
+        groupFund.setTotalAmount(groupFund.getTotalAmount() + Long.valueOf(app.getNumber()));
+        groupFund.setCost(groupFund.getCost() + Long.valueOf(app.getNumber()));
+        groupFund.setRemainAmount(groupFund.getTotalAmount() - groupFund.getCost());
+        groupFundService.updateById(groupFund);
+        funding.setCost(funding.getCost() + Long.valueOf(app.getNumber()));
+        funding.setRemainAmount(funding.getTotalAmount() - funding.getCost());
+        fundingService.updateById(funding);
         if (is_success)
             return Result.ok();
         else

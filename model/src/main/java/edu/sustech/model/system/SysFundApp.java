@@ -5,6 +5,9 @@ import edu.sustech.model.base.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+@Data
+@ApiModel(description = "经费申请")
+@TableName("sys_fund_app")
 public class SysFundApp extends BaseEntity {
     @ApiModelProperty(value = "经费id")
     @TableField("fund_id")
