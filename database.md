@@ -98,6 +98,22 @@ CREATE TABLE sys_funding (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:不可用 1:可用）    '
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='经费表';
+
+drop table if exists sys_fund_app;
+CREATE TABLE `sys_fund_app` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `fund_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '经费id',
+  `fund_name` varchar(20) NOT NULL DEFAULT '' COMMENT '经费名称',
+  `app_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '申请id',
+  `app_name` varchar(20) DEFAULT NULL COMMENT '申请名称',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:可用 1:不可用）',
+  PRIMARY KEY (`id`),
+  KEY `idx_fund_id` (`fund_id`),
+  KEY `idx_app_id` (`app_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='经费申请';
+
 drop table if exists sys_group_funding;
 CREATE TABLE sys_group_funding (
   id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键id',
@@ -113,6 +129,7 @@ CREATE TABLE sys_group_funding (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:不可用 1:可用）    '
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='课题组经费';
+
 drop table if exists sys_group_funding_detail;
 CREATE TABLE sys_group_funding_detail (
   id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键id',
