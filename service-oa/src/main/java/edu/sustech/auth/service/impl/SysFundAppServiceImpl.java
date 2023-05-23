@@ -15,5 +15,4 @@ public class SysFundAppServiceImpl extends ServiceImpl<SysFundAppMapper, SysFund
             return this.getOne(new LambdaQueryWrapper<SysFundApp>().eq(SysFundApp::getAppId,appId));
         }
 
-
 }

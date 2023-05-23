@@ -4,8 +4,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import edu.sustech.model.base.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Data
+@NoArgsConstructor
 @ApiModel(description = "经费申请")
 @TableName("sys_fund_app")
 public class SysFundApp extends BaseEntity {
@@ -23,6 +27,6 @@ public class SysFundApp extends BaseEntity {
 
     @ApiModelProperty(value = "申请名")
     @TableField("app_name")
-    private Long appName;
+    private String appName;
 
 }

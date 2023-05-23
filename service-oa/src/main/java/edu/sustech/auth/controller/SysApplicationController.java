@@ -104,8 +104,9 @@ public class SysApplicationController {
         boolean is_success = service.update(wrapper);
         SysApplication app = service.getById(id);
         Long groupId = app.getGroupId();
+        System.out.println(id);
         SysFundApp fundApp = fundAppService.getByAppId(id);
-        SysGroupFund groupFund = groupFundService.getById(groupId);
+        SysGroupFund groupFund = groupFundService.getByGroupId(groupId);
         SysFunding funding = fundingService.getById(fundApp.getFundId());
         QueryWrapper<SysGroupFundDetail> queryWrapper = new QueryWrapper<>();
         SysGroupFundDetail sysGroupFundDetail=groupFundDetailService.getByGroupCategory(app.getCategory1(),app.getCategory2(),fundApp.getFundId(), app.getGroupId());

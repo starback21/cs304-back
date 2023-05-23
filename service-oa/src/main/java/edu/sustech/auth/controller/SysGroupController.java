@@ -259,7 +259,11 @@ public class SysGroupController {
         result.put("totalFund", groupFund.getTotalAmount());
         result.put("usedFund", groupFund.getCost());
         result.put("leftFund", groupFund.getRemainAmount());
-        result.put("completeRate", groupFund.getCost()*100/groupFund.getTotalAmount());
+        if (groupFund.getTotalAmount() == 0){
+            result.put("completeRate", 100);
+        }else{
+            result.put("completeRate", groupFund.getCost()*100/groupFund.getTotalAmount());
+        }
         result.put("complete", true);
         return Result.ok(result);
     }

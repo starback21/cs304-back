@@ -387,6 +387,13 @@ public class SysFundingController {
                 sysGroupFundDetailService.updateById(sysGroupFundDetail);
             }
         }
+        if(count<sysGroupFundDetails1.size()){
+            for(int i=(int)count;i<sysGroupFundDetails1.size();i++){
+                SysGroupFundDetail sysGroupFundDetail=sysGroupFundDetails1.get(i);
+                sysGroupFundDetailService.removeById(sysGroupFundDetail.getId());
+                sum=sum-sysGroupFundDetail.getTotalAmount();
+            }
+        }
         assert sysGroupFund != null;
         sysGroupFund.setTotalAmount(sysGroupFund.getTotalAmount()+sum);
         sysGroupFund.setCost(sysGroupFund.getCost());
