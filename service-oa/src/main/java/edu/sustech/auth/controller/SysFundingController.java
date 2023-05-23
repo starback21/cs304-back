@@ -307,8 +307,8 @@ public class SysFundingController {
                 map.put("category1",sysGroupFundDetail.getCategory1());
                 map.put("category2",sysGroupFundDetail.getCategory2());
                 map.put("total",sysGroupFundDetail.getTotalAmount().toString());
-                map.put("cost",sysGroupFund.getCost().toString());
-                map.put("left",sysGroupFund.getRemainAmount().toString());
+                map.put("cost",sysGroupFundDetail.getUsedAmount().toString());
+                map.put("left", String.valueOf(sysGroupFundDetail.getTotalAmount()-sysGroupFundDetail.getUsedAmount()));
                 map.put("new","False");
                 result.add(map);
             }
@@ -382,7 +382,6 @@ public class SysFundingController {
         sysGroupFund.setRemainAmount(sysGroupFund.getTotalAmount()-sysGroupFund.getCost());
         sysGroupFundService.updateById(sysGroupFund);
         assert sysFunding != null;
-        sysFunding.setTotalAmount(sysFunding.getTotalAmount()+sum);
         sysFunding.setCost(sysFunding.getCost()+sum);
         sysFunding.setRemainAmount(sysFunding.getTotalAmount()-sysFunding.getCost());
         sysFundingService.updateById(sysFunding);
@@ -394,8 +393,8 @@ public class SysFundingController {
                 map.put("category1",sysGroupFundDetail.getCategory1());
                 map.put("category2",sysGroupFundDetail.getCategory2());
                 map.put("total",sysGroupFundDetail.getTotalAmount().toString());
-                map.put("cost",sysGroupFund.getCost().toString());
-                map.put("left",sysGroupFund.getRemainAmount().toString());
+                map.put("cost",sysGroupFundDetail.getUsedAmount().toString());
+                map.put("left", String.valueOf(sysGroupFundDetail.getTotalAmount()-sysGroupFundDetail.getUsedAmount()));
                 map.put("new","False");
                 result.add(map);
             }

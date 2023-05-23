@@ -88,8 +88,6 @@ CREATE TABLE sys_funding (
   id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键id',
   funding_id INT NOT NULL default 114514 COMMENT '经费id' ,
   funding_name VARCHAR(20) NOT NULL default 'test' COMMENT '经费名称',
-  group_id INT NOT NULL default '114514' COMMENT '课题组id',
-  group_name VARCHAR(20) NOT NULL default 'test'COMMENT '课题组名称',
   total_amount DECIMAL(10, 2) NOT NULL default '9999999'COMMENT '总经费',
   cost DECIMAL(10, 2) NOT NULL default 0 COMMENT '单次花费',
   remain_amount DECIMAL(10, 2) default 9999 NOT NULL COMMENT '剩余经费',
@@ -110,21 +108,23 @@ CREATE TABLE sys_group_funding (
   total_amount DECIMAL(10, 2) NOT NULL default '9999999'COMMENT '总经费',
   cost DECIMAL(10, 2) NOT NULL default 0 COMMENT '花费',
   remain_amount DECIMAL(10, 2) default 9999 NOT NULL COMMENT '剩余经费',
+    status  VARCHAR(20) NOT NULL DEFAULT 'complete' COMMENT '状态',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:不可用 1:可用）    '
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='经费表';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='课题组经费';
 drop table if exists sys_group_funding_detail;
 CREATE TABLE sys_group_funding_detail (
   id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键id',
   funding_id INT NOT NULL default 114514 COMMENT '经费id' ,
   group_id INT NOT NULL default '114514' COMMENT '课题组id',
   total_amount DECIMAL(10, 2) NOT NULL default '9999999'COMMENT '总经费',
-  'category1' VARCHAR(20) NOT NULL default 'test' COMMENT '一级分类',
-    'category2' VARCHAR(20) NOT NULL default 'test' COMMENT '二级分类',
+   `used_amount`  DECIMAL(10, 2) NOT NULL default 0 COMMENT '花费',
+   category1 VARCHAR(50) default 'test'COMMENT '一级分类',
+    category2 VARCHAR(50) default'test1'  COMMENT '二级分类',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:不可用 1:可用）    '
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='经费表';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='详细经费表';
 
 ```
