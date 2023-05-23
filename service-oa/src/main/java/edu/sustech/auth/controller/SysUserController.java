@@ -5,20 +5,17 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import edu.sustech.auth.service.SysApplicationService;
-import edu.sustech.auth.service.SysFundingService;
+import edu.sustech.auth.service.*;
 
-import edu.sustech.auth.service.SysUserService;
 import edu.sustech.common.handler.SpecialException;
+import edu.sustech.common.jwt.JwtHelper;
 import edu.sustech.common.utils.MD5;
-import edu.sustech.model.system.SysApplication;
-import edu.sustech.model.system.SysFunding;
+import edu.sustech.model.system.*;
 
-import edu.sustech.re.system.PageApplication;
+import edu.sustech.re.system.PageGroup;
 import edu.sustech.re.system.PageMsg;
 import edu.sustech.re.system.PageUser;
 import edu.sustech.common.result.Result;
-import edu.sustech.model.system.SysUser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +38,8 @@ import java.util.*;
 public class SysUserController {
 
     @Autowired
-    private SysUserService service;
+    private SysUserService userService;
+
     @Autowired
     private SysFundingService fundingService;
     @Autowired
@@ -59,18 +57,19 @@ public class SysUserController {
         QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
         wrapper.ne("name","admin");
         wrapper.orderByAsc("uid");
-        List<SysUser> userList = service.list(wrapper);
+        List<SysUser> userList = userService.list(wrapper);
         List<PageUser> users = new ArrayList<>();
         int index = 0;
+        //单独查询某个人
         if (userid != null){
-            SysUser user = service.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUid,userid));
+            SysUser user = userService.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUid,userid));
             PageUser tuser = new PageUser();
             tuser.setId(user.getId());
             tuser.setKey(user.getUid());
             tuser.setName(user.getName());
             tuser.setEmail(user.getEmail());
             tuser.setPhone(user.getPhone());
-            List<String> groupList = service.getUserGroup(user.getId());
+            List<PageGroup> groupList = userService.getUserGroup(user.getId());
             tuser.setGroup(groupList);
             users.add(tuser);
             result.put("users",users);
@@ -99,7 +98,7 @@ public class SysUserController {
     @GetMapping("/getAllAccountName")
     public Result<List<String>> getAllAccountName() {
         List<String> nameList = new ArrayList<>();
-        List<SysUser> userList = service.list();
+        List<SysUser> userList = userService.list();
         for (SysUser sysUser : userList){
             nameList.add(sysUser.getName());
         }
@@ -115,7 +114,7 @@ public class SysUserController {
         String mail = jsonParam.get("email").toString();
         String phone = jsonParam.get("phone").toString();
         SysUser user = new SysUser();
-        if (service.selectNameSame(name)){
+        if (userService.selectNameSame(name)){
             throw new SpecialException(201,"用户名重复");
         }
         user.setName(name);
@@ -125,7 +124,7 @@ public class SysUserController {
         Random random = new Random();
         int l1 = random.nextInt(199999) + 100000;
         //当uid不重复时
-        while (service.selectUidSame((long) l1)){
+        while (userService.selectUidSame((long) l1)){
             l1 = random.nextInt(199999) + 100000;
         }
         user.setUid((long) l1);
@@ -134,8 +133,8 @@ public class SysUserController {
         //加密密码
         String passwordMd5 = MD5.encrypt(psw);
         user.setPassword(passwordMd5);
-        boolean is_success = service.save(user);
-        service.addUserToGroup((long) l1,groupNameList);
+        boolean is_success = userService.save(user);
+        userService.addUserToGroup((long) l1,groupNameList);
         if (is_success) {
             return Result.ok();
         } else {
@@ -146,12 +145,12 @@ public class SysUserController {
     @ApiOperation(value = "根据id列表删除")
     @PostMapping("/deleteUsers")
     public Result batchRemove(@RequestBody JSONObject jsonParam) {
-        JSONArray data = jsonParam.getJSONArray("idList");
+        JSONArray data = jsonParam.getJSONArray("ids");
         String js = JSONObject.toJSONString(data, SerializerFeature.WriteClassName);
         List<Long> idList = JSONObject.parseArray(js, Long.class);
         QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
         wrapper.in("uid",idList);
-        boolean is_success = service.remove(wrapper);
+        boolean is_success = userService.remove(wrapper);
         if (is_success){
             return Result.ok();
         }else {
@@ -200,14 +199,14 @@ public class SysUserController {
         List<String > adminList = JSONObject.parseArray(js1, String.class);
 
         Long uid = jsonParam.getLong("userId");
-        service.addUserToGroup(uid,groupNameList,adminList);
+        userService.addUserToGroup(uid,groupNameList,adminList);
         return Result.ok();
     }
 
     @ApiOperation("getAdminMessages")
     @GetMapping("getAdminMessages")
     public Result<Map<String ,Object>> getAdminMessages(@RequestParam(value = "page") int page,
-                                             @RequestParam(value = "type",required = false)String  type
+                                                        @RequestParam(value = "type",required = false) String type
     ){
 
 //        int index = 0;
@@ -224,12 +223,13 @@ public class SysUserController {
         msg.setNewComing(true);
         msg.setMsg("1test msg api");
         Map<String,Object> resul = new HashMap<>(2);
+        result_list.add(msg);
         resul.put("data",result_list);
         resul.put("total",result_list.size());
         return Result.ok(resul);
     }
 
-    @ApiOperation("getAdminMessages")
+    @ApiOperation("getUserMessages")
     @GetMapping("getUserMessages")
     public Result<Map<String ,Object>> getUserMessages(@RequestParam(value = "page") int page,
                                                         @RequestParam(value = "type",required = false)String  type
@@ -276,12 +276,11 @@ public class SysUserController {
                 newFund++;
             }
         }
-        map.put("newApplication",newApp);
-        map.put("unserwayApplication",unApp);
-        map.put("newFund",newFund);
-        map.put("underwayFund",unFund);
+        map.put("recentApplication",newApp);
+        map.put("underwayApplication",unApp);
+        map.put("permittedApplication",newFund);
+        map.put("rejectedApplication",unFund);
         return Result.ok(map);
     }
-
 }
 

@@ -1,17 +1,15 @@
 package edu.sustech.model.system;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import edu.sustech.model.base.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
 
 /**
  * <p>
@@ -39,5 +37,8 @@ public class SysGroup extends BaseEntity {
     @ApiModelProperty(value = "描述")
     @TableField("description")
     private String description;
+
+    @TableField(exist = false)
+    private List<SysUser> userList;
 
 }

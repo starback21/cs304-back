@@ -11,6 +11,7 @@ import java.util.Date;
 @Data
 public class PageApplication {
     int id;
+    String key;
     String name;
     String state;
     String group;

@@ -23,5 +23,5 @@ public class PageUser {
     String email;
     String phone;
     Boolean admin = false;
-    List<String> group;
+    List<PageGroup> group;
 }

@@ -65,6 +65,7 @@ public class SysApplicationController {
             if (index > (page - 1) * 3 && index <= page * 3){
                 PageApplication tmp = new PageApplication();
                 tmp.setId(Math.toIntExact(a.getId()));
+                tmp.setKey(a.getId().toString());
                 tmp.setName(a.getTitle());
                 tmp.setState(a.getState());
                 tmp.setGroup(a.getGroupName());
@@ -140,7 +141,7 @@ public class SysApplicationController {
 
     @ApiOperation(value = "获取申请时间线")
     @GetMapping("/getApplicationTimeline")
-    public Result<Map<String, Object>> getApplicationTimeline(@RequestParam(value = "fundId") int fundId) {
+    public Result<Map<String, Object>> getApplicationTimeline(@RequestParam(value = "id") int fundId) {
         SysApplication app = service.getById(fundId);
         Date date1 = app.getCreateTime();
         Date date2 = app.getChangeTime();

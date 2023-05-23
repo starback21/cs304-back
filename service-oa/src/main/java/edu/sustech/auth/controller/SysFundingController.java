@@ -227,7 +227,7 @@ public class SysFundingController {
         return Result.ok(result);
     }
     @ApiOperation(value = "根据组添加经费")
-    @GetMapping ("addGroupsToFund")
+    @PostMapping ("addGroupsToFund")
     public Result addGroupsToFund(@RequestBody Map<String,Object> GROUPANDID){
         String fundId=GROUPANDID.get("fundId").toString();
         List<String> groupNames = (List<String>) GROUPANDID.get("groups");
@@ -288,7 +288,8 @@ public class SysFundingController {
     }
     @ApiOperation(value = "根据经费id和组id获取经费详情")
     @GetMapping ("getFundDetailByGroup")
-    public Result getFundInfoByGroupAndFund(@RequestParam String groupId,@RequestParam(value ="fundId") String fundingId) {
+    public Result getFundInfoByGroupAndFund(@RequestParam(value ="groupId") String groupId,
+                                            @RequestParam(value ="fundId") String fundingId) {
         List<SysGroupFundDetail> sysGroupFundDetails = sysGroupFundDetailService.list();
         List<SysGroupFund> sysGroupFunds = sysGroupFundService.list();
         SysGroupFund sysGroupFund = null;
@@ -404,93 +405,27 @@ public class SysFundingController {
     }
     @ApiOperation(value = "根据id获取、经费信息")
     @GetMapping("getFundStatistics")
-    private Result getFundStatistics(@RequestParam(value = "id",required = false) Long fundId){
-        System.out.println("调用获取经费信息接口");
-        List<SysFunding> sysFundings = sysFundingService.list();
+    private Result getFundStatistics(@RequestParam(value = "id") int fundId){
+        System.out.println("调用获取经费信息接口+ "+fundId);
+        SysFunding fund = sysFundingService.getById(fundId);
+
         Map<String,Object>result = new HashMap<>();
-        for(SysFunding sysFunding:sysFundings){
-            if(sysFunding.getFundingId().equals(fundId)){
-                result.put("name",sysFunding.getFundingName());
-                result.put("totalFund",sysFunding.getTotalAmount().toString());
-                result.put("left",sysFunding.getRemainAmount().toString());
-                result.put("used",sysFunding.getCost().toString());
-                result.put("completeRate", sysFunding.getCost()*100/sysFunding.getTotalAmount());
-                if(sysFunding.getStatus().equals("complete")){
-                    result.put("complete","True");
-                }else{
-                    result.put("complete","False");
-                }
-                break;
-            }
+        result.put("name",fund.getFundingName());
+        result.put("totalFund",fund.getTotalAmount().toString());
+        result.put("left",fund.getRemainAmount().toString());
+        result.put("used",fund.getCost().toString());
+        result.put("completeRate", fund.getCost()*100/fund.getTotalAmount());
+        if(fund.getStatus().equals("complete")){
+            result.put("complete","True");
+        }else{
+            result.put("complete","False");
         }
-        System.out.println(result);
+
+
+        System.out.println("result: "+result);
         return Result.ok(result);
     }
-    @ApiOperation(value = "根据用户id获取课题组")
-    @GetMapping("getUserGroups")
-    public Result<List<Map<Object,Object>>> getUserGroups(@RequestParam(value = "userId") Long userId){
-        List<SysUserRole>sysUserRoles = sysUserRoleService.list();
-        List<SysGroupFund>sysGroupFunds = sysGroupFundService.list();
-        List<SysUser>sysUsers = sysUserService.list();
-        List<SysUserRole>sysUserRoles1 = new ArrayList<>();
-        for(SysUserRole sysUserRole:sysUserRoles){
-            if(sysUserRole.getUserId().equals(userId)){
-                sysUserRoles1.add(sysUserRole);
-            }
-        }
-        List<Long>groupIds = new ArrayList<>();
-        for(SysUserRole sysUserRole:sysUserRoles1){
-            if (!groupIds.contains(sysUserRole.getGroupId())){
-                groupIds.add(sysUserRole.getGroupId());
-            }
-        }
-        List<Map<Object,Object>>users= new ArrayList<>();
-        for(SysUserRole sysUserRole:sysUserRoles){
-            Map<Object,Object>map = new HashMap<>();
-            if(groupIds.contains(sysUserRole.getGroupId())){
-                map.put("userId",sysUserRole.getUserId());
-                map.put("admin",sysUserRole.getRoleId());
-                map.put("groupId",sysUserRole.getGroupId());
-                users.add(map);
-            }
-        }
-        List<Map<Object,Object>>usernames= new ArrayList<>();
-        for(Map<Object,Object>user:users){
-            for(SysUser sysUser:sysUsers){
-                if(user.get("userId").equals(sysUser.getId())){
-                    Map<Object,Object>map = new HashMap<>();
-                    map.put("username",sysUser.getName());
-                    map.put("admin",user.get("admin"));
-                    map.put("groupId",user.get("groupId"));
-                    usernames.add(map);
-                    break;
-                }
-            }
-        }
-        List<Map<Object,Object>>result = new ArrayList<>();
-        for(Long groupId:groupIds){
-            for(SysGroupFund sysGroupFund:sysGroupFunds){
-                if(sysGroupFund.getGroupId().equals(groupId)){
-                    Map<Object,Object>map = new HashMap<>();
-                    map.put("id",sysGroupFund.getGroupId());
-                    map.put("name",sysGroupFund.getGroupName());
-                    map.put("total",sysGroupFund.getTotalAmount());
-                    map.put("left",sysGroupFund.getRemainAmount());
-                    Map<String,String>user = new HashMap<>();
-                    for(Map<Object,Object>user1:usernames){
-                        if(user1.get("groupId").equals(groupId)){
-                            user.put("name",user1.get("username").toString());
-                            if(user1.get("admin").toString().equals("1")) {user.put("admin","True");}
-                            else {user.put("admin","False");}
-                        }
-                    }
-                    map.put("users",user);
-                    result.add(map);
-                }
-            }
-        }
-        return Result.ok(result);
-    }
+
 
 
 

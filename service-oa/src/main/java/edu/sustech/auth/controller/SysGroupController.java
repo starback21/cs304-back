@@ -5,14 +5,17 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import edu.sustech.auth.service.SysGroupFundService;
 import edu.sustech.auth.service.SysGroupService;
 
 import edu.sustech.auth.service.SysUserRoleService;
 import edu.sustech.auth.service.SysUserService;
+import edu.sustech.common.handler.SpecialException;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.SysGroup;
 
 
+import edu.sustech.model.system.SysGroupFund;
 import edu.sustech.model.system.SysUser;
 import edu.sustech.model.system.SysUserRole;
 import edu.sustech.re.system.PageGroup;
@@ -48,6 +51,8 @@ public class SysGroupController {
     private SysUserRoleService userRoleService;
     @Autowired
     private SysUserService userService;
+    @Autowired
+    private SysGroupFundService groupFundService;
 
     @ApiOperation("查询所有课题组")
     @GetMapping("/findAll")
@@ -65,38 +70,38 @@ public class SysGroupController {
         }
         return Result.ok(nameList);
     }
-    @ApiOperation(value = "根据id查询")
-    @GetMapping("/getGroup")
-    public Result<PageGroup> get(@RequestParam(value = "id")Long id) {
-        SysGroup group = sysGroupService.getById(id);
-        PageGroup tempGroup = new PageGroup();
-        QueryWrapper<SysUserRole> wrapper = new QueryWrapper<>();
-        wrapper.eq("group_id",id);
-        List<SysUserRole> tlist =  userRoleService.list(wrapper);
-        if (tlist.size() != 0){
-            List<PageUser> users = new ArrayList<>();
-            for (SysUserRole t:tlist){
-                Long userId = t.getUserId();
-                SysUser user = userService.getById(userId);
-                PageUser pageUser = new PageUser();
-                pageUser.setId(userId);
-                pageUser.setAdmin(t.getRoleId() == 2);
-                pageUser.setName(user.getName());
-                users.add(pageUser);
-            }
-            tempGroup.setUsers(users);
-        }else {
-            tempGroup.setUsers(null);
-        }
-
-        tempGroup.setId(group.getId());
-        tempGroup.setName(group.getGroupName());
-        tempGroup.setCost(1000);
-        tempGroup.setTotal(100);
-        tempGroup.setLeft(80);
-
-        return Result.ok(tempGroup);
-    }
+//    @ApiOperation(value = "根据id查询")
+//    @GetMapping("/getGroup")
+//    public Result<PageGroup> get(@RequestParam(value = "id")Long id) {
+//        SysGroup group = sysGroupService.getById(id);
+//        PageGroup tempGroup = new PageGroup();
+//        QueryWrapper<SysUserRole> wrapper = new QueryWrapper<>();
+//        wrapper.eq("group_id",id);
+//        List<SysUserRole> tlist =  userRoleService.list(wrapper);
+//        if (tlist.size() != 0){
+//            List<PageUser> users = new ArrayList<>();
+//            for (SysUserRole t:tlist){
+//                Long userId = t.getUserId();
+//                SysUser user = userService.getById(userId);
+//                PageUser pageUser = new PageUser();
+//                pageUser.setId(userId);
+//                pageUser.setAdmin(t.getRoleId() == 2);
+//                pageUser.setName(user.getName());
+//                users.add(pageUser);
+//            }
+//            tempGroup.setUsers(users);
+//        }else {
+//            tempGroup.setUsers(null);
+//        }
+//
+//        tempGroup.setId(group.getId());
+//        tempGroup.setName(group.getGroupName());
+//        tempGroup.setCost(1000);
+//        tempGroup.setTotal(100);
+//        tempGroup.setLeft(80);
+//
+//        return Result.ok(tempGroup);
+//    }
     @ApiOperation(value = "分页获取课题组数据")
     @GetMapping("/getGroups")
     public Result<Map<String, Object>> getGroups(@RequestParam(value = "page") int page,
@@ -108,32 +113,15 @@ public class SysGroupController {
         //作为结果返回
         List<PageGroup> groups = new ArrayList<>();
         //条件查询，如果有id则单独查询
-        if (groupid!=null){
+        //有groupId，单独查询
+        if (groupid != null){
             //从id获取课题组的所有信息
             SysGroup group = sysGroupService.getById(groupid);
             //创建返回对象
             PageGroup tempGroup = new PageGroup();
-            QueryWrapper<SysUserRole> wrapper = new QueryWrapper<>();
-            wrapper.eq("group_id",groupid);
-            //从角色用户对应表中查到所有隶属于该课题组的人
-            List<SysUserRole> tlist =  userRoleService.list(wrapper);
-            //如果课题组中的人不为空
-            if (tlist.size() != 0){
-                //返回结果中的用户列表
-                List<PageUser> users = new ArrayList<>();
-                //遍历角色用户列表
-                for (SysUserRole t:tlist){
-                    Long userId = t.getUserId();
-                    String username = t.getUserName();
-                    //创建返回的用户对象
-                    PageUser pageUser = new PageUser();
-                    pageUser.setId(userId);
-                    pageUser.setAdmin(t.getRoleId() == 2);
-                    pageUser.setName(username);
-                    //在用户列表中加入该对象
-                    users.add(pageUser);
-                }
-                //在返回的group对象中加入user列表
+            //从表中查到所有隶属于该课题组的人，获取成员列表
+            List<PageUser> users = sysGroupService.getGroupMember(groupid);
+            if (users.size() != 0){
                 tempGroup.setUsers(users);
             }else {
                 tempGroup.setUsers(null);
@@ -145,25 +133,14 @@ public class SysGroupController {
             tempGroup.setLeft(80);
             groups.add(tempGroup);
         }else {
+            //全部查询
             int index = 0;
             for (SysGroup group : groupList) {
                 index ++;
                 if (index > (page - 1) * limit && index <= page * limit) {
                     PageGroup tempGroup = new PageGroup();
-                    QueryWrapper<SysUserRole> wrapper = new QueryWrapper<>();
-                    wrapper.eq("group_id",group.getId());
-                    List<SysUserRole> tlist =  userRoleService.list(wrapper);
-                    if (tlist.size() != 0){
-                        List<PageUser> users = new ArrayList<>();
-                        for (SysUserRole t:tlist){
-                            Long userId = t.getUserId();
-                            SysUser user = userService.getById(userId);
-                            PageUser pageUser = new PageUser();
-                            pageUser.setId(userId);
-                            pageUser.setAdmin(t.getRoleId() == 2);
-                            pageUser.setName(user.getName());
-                            users.add(pageUser);
-                        }
+                    List<PageUser> users = sysGroupService.getGroupMember(group.getId());
+                    if (users.size() != 0){
                         tempGroup.setUsers(users);
                     }else {
                         tempGroup.setUsers(null);
@@ -271,13 +248,18 @@ public class SysGroupController {
     public Result<Map<String,Object>> getGroupStatistics(@RequestParam(value = "groupId") String id){
         Map<String,Object> result = new HashMap<>();
         SysGroup group = sysGroupService.getById(id);
+        if (group == null){
+            throw new SpecialException(201,"课题组为空");
+        }
         int memberNum = userRoleService.count(new QueryWrapper<SysUserRole>().eq("group_id",id));
+        SysGroupFund groupFund = groupFundService.getOne(new QueryWrapper<SysGroupFund>().eq("group_id",id));
+
         result.put("name",group.getGroupName());
         result.put("memberNum", memberNum);
-        result.put("totalFund", 10);
-        result.put("usedFund", 2);
-        result.put("leftFund", 8);
-        result.put("completeRate", 20);
+        result.put("totalFund", groupFund.getTotalAmount());
+        result.put("usedFund", groupFund.getCost());
+        result.put("leftFund", groupFund.getRemainAmount());
+        result.put("completeRate", groupFund.getCost()*100/groupFund.getTotalAmount());
         result.put("complete", true);
         return Result.ok(result);
     }

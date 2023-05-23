@@ -1,7 +1,6 @@
 package edu.sustech.auth.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import edu.sustech.auth.service.SysGroupService;
 import edu.sustech.auth.service.SysUserRoleService;
 import edu.sustech.model.system.SysUser;
@@ -9,6 +8,8 @@ import edu.sustech.auth.mapper.SysUserMapper;
 import edu.sustech.auth.service.SysUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.sustech.model.system.SysUserRole;
+import edu.sustech.re.system.PageGroup;
+import edu.sustech.re.system.PageUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -99,13 +100,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public List<String> getUserGroup(Long userId) {
+    public List<PageGroup> getUserGroup(Long userId) {
         List<SysUserRole> list = roleService.list(new LambdaQueryWrapper<SysUserRole>()
                 .eq(SysUserRole::getUserId,userId));
-        List<String> result = new ArrayList<>();
+        List<PageGroup> result = new ArrayList<>();
+        //课题组和用户，一个用户按id查询，查出一个列表，其中包括他的所有课题组
         for (SysUserRole role : list){
-            String gName = role.getGroupName();
-            result.add(gName);
+            PageGroup group = new PageGroup();
+            group.setId(role.getGroupId());
+            group.setName(role.getGroupName());
+            List<PageUser> groupMember = groupService.getGroupMember(role.getGroupId());
+            group.setUsers(groupMember);
+            result.add(group);
         }
         return result;
     }

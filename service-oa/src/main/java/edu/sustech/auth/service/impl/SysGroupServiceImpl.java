@@ -29,9 +29,10 @@ import java.util.List;
 public class SysGroupServiceImpl extends ServiceImpl<SysGroupMapper, SysGroup> implements SysGroupService {
 
     @Autowired
-    private SysUserRoleService sysUserRoleService;
+    private SysUserRoleService userRoleService;
     @Autowired
     private SysUserService userService;
+
 
     @Override
     public boolean createAndAddUser(Long groupId,String groupName, List<String> userNames) {
@@ -44,7 +45,7 @@ public class SysGroupServiceImpl extends ServiceImpl<SysGroupMapper, SysGroup> i
             Long id = userService.selectIdByName(n);
             sysUserRole.setUserId(id);
             sysUserRole.setUserName(n);
-            sysUserRoleService.save(sysUserRole);
+            userRoleService.save(sysUserRole);
         }
 
         return true;
@@ -72,7 +73,7 @@ public class SysGroupServiceImpl extends ServiceImpl<SysGroupMapper, SysGroup> i
                 }
             }
             if (isAdmin) adminList.remove(s);
-            sysUserRoleService.save(sysUserRole);
+            userRoleService.save(sysUserRole);
         }
 
         return true;
@@ -82,7 +83,7 @@ public class SysGroupServiceImpl extends ServiceImpl<SysGroupMapper, SysGroup> i
     public boolean deleteGroupUser(Long groupId, Long userId) {
         QueryWrapper<SysUserRole> wrapper = new QueryWrapper<>();
         wrapper.eq("group_id",groupId).eq("user_id",userId);
-        return sysUserRoleService.remove(wrapper);
+        return userRoleService.remove(wrapper);
     }
 
     @Override
@@ -104,6 +105,25 @@ public class SysGroupServiceImpl extends ServiceImpl<SysGroupMapper, SysGroup> i
     @Override
     public Long getIdByName(String name) {
         return baseMapper.selectGroupIdByName(name);
+    }
+
+    @Override
+    public List<PageUser> getGroupMember(Long groupId) {
+        QueryWrapper<SysUserRole> wrapper = new QueryWrapper<>();
+        wrapper.eq("group_id",groupId);
+        List<SysUserRole> tlist =  userRoleService.list(wrapper);
+        List<PageUser> users = new ArrayList<>();
+        if (tlist.size() != 0){
+            for (SysUserRole t:tlist){
+                Long userId = t.getUserId();
+                PageUser pageUser = new PageUser();
+                pageUser.setId(userId);
+                pageUser.setAdmin(t.getRoleId() == 2);
+                pageUser.setName(t.getUserName());
+                users.add(pageUser);
+            }
+        }
+        return users;
     }
 
 }

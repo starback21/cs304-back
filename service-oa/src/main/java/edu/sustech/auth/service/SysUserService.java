@@ -2,6 +2,7 @@ package edu.sustech.auth.service;
 
 import edu.sustech.model.system.SysUser;
 import com.baomidou.mybatisplus.extension.service.IService;
+import edu.sustech.re.system.PageGroup;
 
 import java.util.List;
 
@@ -26,5 +27,5 @@ public interface SysUserService extends IService<SysUser> {
 
     void addUserToGroup(Long userId, List<String> groupList);
 
-    List<String> getUserGroup(Long userId);
+    List<PageGroup> getUserGroup(Long userId);
 }

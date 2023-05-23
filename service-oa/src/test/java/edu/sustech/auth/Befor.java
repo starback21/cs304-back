@@ -40,23 +40,21 @@ public class Befor {
         }
         System.out.println("create admin");
     }
-    @Test
-    public void addFundings() {
-        SysFunding funding = new SysFunding();
-        long base = 510L;
-        for (int i = 0; i < 5; i++) {
-            funding.setFundingId(base++);
-            funding.setFundingName("test"+base);
-            funding.setCost(100L);
-            funding.setGroupId(15L);
-            funding.setGroupName("电子");
-            funding.setTotalAmount(10000L);
-            funding.setRemainAmount(9900L);
-            fundingService.save(funding);
-        }
-
-
-    }
+//    @Test
+//    public void addFundings() {
+//        SysFunding funding = new SysFunding();
+//        long base = 510L;
+//        for (int i = 0; i < 5; i++) {
+//            funding.setFundingId(base++);
+//            funding.setFundingName("test"+base);
+//            funding.setCost(100L);
+//            funding.setGroupId(15L);
+//            funding.setGroupName("电子");
+//            funding.setTotalAmount(10000L);
+//            funding.setRemainAmount(9900L);
+//            fundingService.save(funding);
+//        }
+//    }
     @Test
     public void addUsers(){
         SysUser user = new SysUser();
@@ -77,6 +75,18 @@ public class Befor {
         application.setGroupId(3L);
         application.setGroupName("计算机");
         application.setNumber(1000);
+        application.setCategory1("eat");
+        application.setState("underway");
+        application.setTitle("吃喝");
+        applicationService.save(application);
+    }
+
+    @Test
+    public void addFunding(){
+        SysApplication application = new SysApplication();
+        application.setGroupId(3L);
+        application.setGroupName("计算机");
+        application.setNumber(2000);
         application.setCategory1("eat");
         application.setState("underway");
         application.setTitle("吃喝");

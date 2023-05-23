@@ -42,15 +42,13 @@ public class LoginController {
             throw new SpecialException(201,"密码错误");
         }
 
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("token", JwtHelper.createToken(sysUser.getId(), sysUser.getUsername()));
-
         Map<String, Object> map = new HashMap<>();
+        map.put("token", JwtHelper.createToken(sysUser.getId(), sysUser.getName()));
         if(Objects.equals(account, "admin")){
-            map.put("token", "qwefqwadf");
+//            map.put("token", "qwefqwadf");
             map.put("identity","admin");
         }else {
-            map.put("token", "asdaccas");
+//            map.put("token", "asdaccas");
             map.put("identity","user");
         }
         return Result.ok(map);
