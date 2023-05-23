@@ -46,22 +46,6 @@ public class UserController {
     @PostMapping("/cancelApplication")
     public Result cancelApplication(@RequestBody JSONObject jsonParam){
         Long id = jsonParam.getLong("id");
-        SysApplication appli = applicationService.getById(id);
-        Long fundId = fundAppService.getByAppId(appli.getId()).getFundId();
-        SysGroupFundDetail sysGroupFundDetail=groupFundDetailService.getByGroupCategory(appli.getCategory1(),appli.getCategory2(),fundId, id);
-        if(sysGroupFundDetail!=null){
-            sysGroupFundDetail.setTotalAmount(sysGroupFundDetail.getTotalAmount()-appli.getNumber());
-            sysGroupFundDetail.setRemainAmount(sysGroupFundDetail.getRemainAmount()-appli.getNumber());
-            groupFundDetailService.updateById(sysGroupFundDetail);
-            SysGroupFund sysGroupFund=groupFundService.getByGroupId(sysGroupFundDetail.getGroupId());
-            sysGroupFund.setTotalAmount(sysGroupFund.getTotalAmount()-appli.getNumber());
-            sysGroupFund.setRemainAmount(sysGroupFund.getRemainAmount()-appli.getNumber());
-            groupFundService.updateById(sysGroupFund);
-            SysFunding sysFunding=fundingService.getById(fundId);
-            sysFunding.setRemainAmount(sysFunding.getRemainAmount()+appli.getNumber());
-            sysFunding.setCost(sysFunding.getCost()-appli.getNumber());
-            fundingService.updateById(sysFunding);
-        }
         boolean is_success = applicationService.removeById(id);
         if (is_success)
             return Result.ok();
@@ -77,27 +61,6 @@ public class UserController {
         List<Long> idList = JSONObject.parseArray(js, Long.class);
         QueryWrapper<SysApplication> wrapper = new QueryWrapper<>();
         wrapper.in("id",idList);
-        for (Long id : idList){
-            SysApplication app = applicationService.getById(id);
-            Long groupId = app.getGroupId();
-            SysFundApp fundApp = fundAppService.getByAppId(id);
-            SysGroupFund groupFund = groupFundService.getById(groupId);
-            SysFunding funding = fundingService.getById(fundApp.getFundId());
-            QueryWrapper<SysGroupFundDetail> queryWrapper = new QueryWrapper<>();
-            SysGroupFundDetail sysGroupFundDetail=groupFundDetailService.getByGroupCategory(app.getCategory1(),app.getCategory2(),fundApp.getFundId(), app.getGroupId());
-            if(sysGroupFundDetail!=null){
-                sysGroupFundDetail.setTotalAmount(sysGroupFundDetail.getTotalAmount()-Long.valueOf(app.getNumber()));
-                sysGroupFundDetail.setRemainAmount(sysGroupFundDetail.getTotalAmount()-sysGroupFundDetail.getUsedAmount());
-                groupFundDetailService.updateById(sysGroupFundDetail);
-                groupFund.setTotalAmount(groupFund.getTotalAmount()-app.getNumber());
-                groupFund.setRemainAmount(groupFund.getRemainAmount()-app.getNumber());
-                groupFund.setTotalAmount(groupFund.getTotalAmount() - Long.valueOf(app.getNumber()));
-                groupFundService.updateById(groupFund);
-                funding.setCost(funding.getCost() - Long.valueOf(app.getNumber()));
-                funding.setRemainAmount(funding.getTotalAmount() - funding.getCost());
-                fundingService.updateById(funding);
-            }
-        }
         boolean is_success = applicationService.remove(wrapper);
         if (is_success)
             return Result.ok();
@@ -137,42 +100,6 @@ public class UserController {
         application.setCategory2(c2);
         application.setComment(comment);
         applicationService.save(application);
-        QueryWrapper<SysApplication> queryWrapper = new QueryWrapper<>();
-        SysApplication appli=applicationService.getOne(queryWrapper.last("limit 1"));;
-        Long fundId = fundAppService.getByAppId(appli.getId()).getFundId();
-        SysGroupFundDetail sysGroupFundDetail=groupFundDetailService.getByGroupCategory(c1,c2,fundId, id);
-        if (sysGroupFundDetail==null){
-            SysGroupFundDetail sysGroupFundDetail1=new SysGroupFundDetail();
-            sysGroupFundDetail1.setFundingId(fundId);
-            sysGroupFundDetail1.setGroupId(id);
-            sysGroupFundDetail1.setCategory1(c1);
-            sysGroupFundDetail1.setCategory2(c2);
-            sysGroupFundDetail1.setTotalAmount((long) num);
-            sysGroupFundDetail1.setUsedAmount((long) 0);
-            sysGroupFundDetail1.setRemainAmount((long) num);
-            groupFundDetailService.save(sysGroupFundDetail1);
-            SysGroupFund sysGroupFund=groupFundService.getByGroupId(id);
-            sysGroupFund.setTotalAmount(sysGroupFund.getTotalAmount()+num);
-            sysGroupFund.setRemainAmount(sysGroupFund.getRemainAmount()+num);
-            groupFundService.updateById(sysGroupFund);
-            SysFunding sysFunding=fundingService.getById(fundId);
-            sysFunding.setCost(sysFunding.getCost()+num);
-            sysFunding.setRemainAmount(sysFunding.getTotalAmount()-sysFunding.getCost());
-            fundingService.updateById(sysFunding);
-        }else{
-            sysGroupFundDetail.setTotalAmount(sysGroupFundDetail.getTotalAmount()+num);
-            sysGroupFundDetail.setRemainAmount(sysGroupFundDetail.getRemainAmount()+num);
-            groupFundDetailService.updateById(sysGroupFundDetail);
-            SysGroupFund sysGroupFund=groupFundService.getByGroupId(id);
-            sysGroupFund.setTotalAmount(sysGroupFund.getTotalAmount()+num);
-            sysGroupFund.setRemainAmount(sysGroupFund.getRemainAmount()+num);
-            groupFundService.updateById(sysGroupFund);
-            SysFunding sysFunding=fundingService.getById(fundId);
-            sysFunding.setCost(sysFunding.getCost()+num);
-            sysFunding.setRemainAmount(sysFunding.getTotalAmount()-sysFunding.getCost());
-            fundingService.updateById(sysFunding);
-        }
-
         return Result.ok();
     }
 

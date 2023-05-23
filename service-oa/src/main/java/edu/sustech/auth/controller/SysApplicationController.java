@@ -150,25 +150,6 @@ public class SysApplicationController {
         for (Long id : idList){
             wrapper.eq("id",id).set("state","reject").set("change_time",date);
             is_success = service.update(wrapper);
-            SysApplication app = service.getById(id);
-            Long groupId = app.getGroupId();
-            SysFundApp fundApp = fundAppService.getByAppId(id);
-            SysGroupFund groupFund = groupFundService.getById(groupId);
-            SysFunding funding = fundingService.getById(fundApp.getFundId());
-            QueryWrapper<SysGroupFundDetail> queryWrapper = new QueryWrapper<>();
-            SysGroupFundDetail sysGroupFundDetail=groupFundDetailService.getByGroupCategory(app.getCategory1(),app.getCategory2(),fundApp.getFundId(), app.getGroupId());
-            if(sysGroupFundDetail!=null){
-                sysGroupFundDetail.setTotalAmount(sysGroupFundDetail.getTotalAmount()-Long.valueOf(app.getNumber()));
-                sysGroupFundDetail.setRemainAmount(sysGroupFundDetail.getTotalAmount()-sysGroupFundDetail.getUsedAmount());
-                groupFundDetailService.updateById(sysGroupFundDetail);
-                groupFund.setTotalAmount(groupFund.getTotalAmount()-app.getNumber());
-                groupFund.setRemainAmount(groupFund.getRemainAmount()-app.getNumber());
-                groupFund.setTotalAmount(groupFund.getTotalAmount() - Long.valueOf(app.getNumber()));
-                groupFundService.updateById(groupFund);
-                funding.setCost(funding.getCost() - Long.valueOf(app.getNumber()));
-                funding.setRemainAmount(funding.getTotalAmount() - funding.getCost());
-                fundingService.updateById(funding);
-            }
 
         }
 
