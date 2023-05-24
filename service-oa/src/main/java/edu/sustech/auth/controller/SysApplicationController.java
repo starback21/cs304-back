@@ -20,7 +20,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.*;
 
 /**
@@ -197,6 +198,51 @@ public class SysApplicationController {
 
         return  Result.ok(result);
     }
+    @ApiOperation(value="根据经费名获取所有申请")
+    @GetMapping("/getApplicationsByFundName")
+    public Result<List<Map<Object,Object>>> getApplicationsByFundName(@RequestParam(value = "fundName") String fundName){
+        List<SysFundApp> fundApps = fundAppService.getByFundName(fundName);
+        List<Map<Object,Object>> result = new ArrayList<>();
+        for(SysFundApp fundApp:fundApps){
+            Map<Object,Object> map = new HashMap<>();
+            SysApplication application = service.getById(fundApp.getAppId());
+            if(application.getState().equals("completed")){
+                Date changeTime = application.getChangeTime();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+                String applicationChangeTime = dateFormat.format(changeTime);;
+                System.out.println("申请时间"+applicationChangeTime);
+                if(result.size()==0){
+                    map.put("changeTime",applicationChangeTime);
+                    map.put("number",application.getNumber());
+                    result.add(map);
+                }else{
+                    boolean isExist = false;
+                    for (Map<Object, Object> objectObjectMap : result) {
+                        String resultChangeTime = (String) objectObjectMap.get("changeTime");
+                        if (applicationChangeTime.equals(resultChangeTime)) {
+                            objectObjectMap.put("number", Long.parseLong(objectObjectMap.get("number").toString()) + Long.valueOf(application.getNumber()));
+                            objectObjectMap.put("changeTime", applicationChangeTime);
+                            isExist= true;
+                            break;
+                        }
+                    }
+                    if (!isExist) {
+                        map.put("changeTime", applicationChangeTime);
+                        map.put("number", application.getNumber());
+                        result.add(map);
+                    }
+                }
+            }
+        }
+        result.sort(new Comparator<Map<Object, Object>>() {
+            @Override
+            public int compare(Map<Object, Object> o1, Map<Object, Object> o2) {
+                return o1.get("changeTime").toString().compareTo(o2.get("changeTime").toString());
+            }
+        });
+        return Result.ok(result);
+    }
+
 
 }
 
