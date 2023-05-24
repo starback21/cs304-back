@@ -9,6 +9,7 @@ import edu.sustech.common.jwt.JwtHelper;
 import edu.sustech.common.result.Result;
 import edu.sustech.common.utils.MD5;
 import edu.sustech.model.system.SysUser;
+import edu.sustech.vo.system.LoginVo;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,9 +30,9 @@ public class LoginController {
     @Autowired
     SysUserService userService;
     @PostMapping("login")
-    public Result login(@RequestBody JSONObject jsonParam) {
-        String account = jsonParam.get("account").toString();
-        String password = jsonParam.get("password").toString();
+    public Result login(@RequestBody LoginVo loginVo) {
+        String account = loginVo.getUsername();
+        String password = loginVo.getPassword();
         LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysUser::getName,account);
         SysUser sysUser = userService.getOne(wrapper)   ;

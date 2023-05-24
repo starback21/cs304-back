@@ -134,7 +134,9 @@ public class SysUserController {
         String passwordMd5 = MD5.encrypt(psw);
         user.setPassword(passwordMd5);
         boolean is_success = userService.save(user);
-        userService.addUserToGroup((long) l1,groupNameList);
+        if(groupNameList != null){
+            userService.addUserToGroup((long) l1,groupNameList);
+        }
         if (is_success) {
             return Result.ok();
         } else {

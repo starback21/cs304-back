@@ -9,20 +9,15 @@ import edu.sustech.auth.service.*;
 import edu.sustech.common.handler.SpecialException;
 import edu.sustech.common.jwt.JwtHelper;
 import edu.sustech.common.result.Result;
-import edu.sustech.model.system.SysApplication;
-import edu.sustech.model.system.SysGroupFund;
-import edu.sustech.model.system.SysUser;
-import edu.sustech.model.system.SysUserRole;
+import edu.sustech.model.system.*;
 import edu.sustech.re.system.PageApplication;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Api(tags = "后台登录管理")
 @RestController
@@ -162,51 +157,59 @@ public class UserController {
         List<Map<Object,Object>> users = new ArrayList<>();
         for(SysUserRole sysUserRole:sysUserRoles){
             Map<Object,Object> map = new HashMap<>();
-            if(groupIds.contains(sysUserRole.getGroupId())){
-                map.put("userId",sysUserRole.getUserId());
-                map.put("admin",sysUserRole.getRoleId());
-                map.put("groupId",sysUserRole.getGroupId());
-                users.add(map);
-            }
+            map.put("userId",sysUserRole.getUserId());
+            map.put("admin",sysUserRole.getRoleId());
+            map.put("groupId",sysUserRole.getGroupId());
+            map.put("userName",userService.getById(sysUserRole.getUserId()).getName());
+            users.add(map);
         }
 
         List<SysGroupFund> sysGroupFunds = groupFundService.list();
 
-        List<SysUser>sysUsers = userService.list();
-
-
-        List<Map<Object,Object>>usernames= new ArrayList<>();
-        for(Map<Object,Object>user:users){
-            for(SysUser sysUser:sysUsers){
-                if(user.get("userId").equals(sysUser.getId())){
-                    Map<Object,Object>map = new HashMap<>();
-                    map.put("username",sysUser.getName());
-                    map.put("admin",user.get("admin"));
-                    map.put("groupId",user.get("groupId"));
-                    usernames.add(map);
-                    break;
-                }
-            }
-        }
         List<Map<Object,Object>>result = new ArrayList<>();
+        Set<Long> set = new HashSet<>();
         for(Long groupId:groupIds){
             for(SysGroupFund sysGroupFund:sysGroupFunds){
                 if(sysGroupFund.getGroupId().equals(groupId)){
-                    Map<Object,Object>map = new HashMap<>();
-                    map.put("id",sysGroupFund.getGroupId());
-                    map.put("name",sysGroupFund.getGroupName());
-                    map.put("total",sysGroupFund.getTotalAmount());
-                    map.put("left",sysGroupFund.getRemainAmount());
-                    Map<String,String>user = new HashMap<>();
-                    for(Map<Object,Object>user1:usernames){
-                        if(user1.get("groupId").equals(groupId)){
-                            user.put("name",user1.get("username").toString());
-                            if(user1.get("admin").toString().equals("2")) {user.put("admin","True");}
-                            else {user.put("admin","False");}
+                    if (set.contains(groupId)){
+                        for (Map<Object,Object> tempMap : result){
+                            if (tempMap.get("id").equals(groupId)){
+                                tempMap.put("total",(Long)tempMap.get("total")+
+                                       sysGroupFund.getTotalAmount() ) ;
+                                tempMap.put("left",(Long)tempMap.get("left")+
+                                        sysGroupFund.getRemainAmount());
+                            }
                         }
+                    }else {
+                        set.add(groupId);
+                        Map<Object,Object>map = new HashMap<>();
+                        map.put("id",sysGroupFund.getGroupId());
+                        map.put("name",sysGroupFund.getGroupName());
+                        map.put("total",sysGroupFund.getTotalAmount());
+                        map.put("left",sysGroupFund.getRemainAmount());
+                        Map<String,String>user = new HashMap<>();
+                        for(Map<Object,Object> user1 : users){
+                            if(user1.get("groupId").equals(groupId)){
+                                user.put("name",user1.get("userName").toString());
+                                if(user1.get("admin").toString().equals("2"))
+                                {
+                                    List<SysGroupFundDetail> list =
+                                            groupFundService.getGroupFundByGId(groupId);
+                                    user.put("admin","True");
+                                    map.put("fund",list);
+                                }
+                                else {
+                                    List<SysGroupFundDetail> list =
+                                            groupFundService.getGroupFundByGId(groupId);
+                                    user.put("admin","False");
+                                    map.put("fund",list);
+                                }
+                            }
+                        }
+                        map.put("users",user);
+                        result.add(map);
                     }
-                    map.put("users",user);
-                    result.add(map);
+
                 }
             }
         }
