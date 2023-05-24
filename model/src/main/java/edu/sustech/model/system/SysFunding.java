@@ -11,9 +11,9 @@ import lombok.Data;
 @TableName("sys_funding")
 public class SysFunding extends BaseEntity {
 
-    @ApiModelProperty(value = "经费id")
-    @TableField("funding_id")
-    private Long fundingId;
+//    @ApiModelProperty(value = "经费id")
+//    @TableField("funding_id")
+//    private Long fundingId;
     @ApiModelProperty(value = "经费名称")
     @TableField("funding_name")
     private String fundingName;

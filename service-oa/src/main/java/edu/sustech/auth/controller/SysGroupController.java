@@ -247,12 +247,13 @@ public class SysGroupController {
     @GetMapping("getGroupStatistics")
     public Result<Map<String,Object>> getGroupStatistics(@RequestParam(value = "groupId") String id){
         Map<String,Object> result = new HashMap<>();
-        SysGroup group = sysGroupService.getById(id);
+        long groupid = sysGroupService.getIdByName(id);
+        SysGroup group=sysGroupService.getById(groupid);
         if (group == null){
             throw new SpecialException(201,"课题组为空");
         }
-        int memberNum = userRoleService.count(new QueryWrapper<SysUserRole>().eq("group_id",id));
-        SysGroupFund groupFund = groupFundService.getOne(new QueryWrapper<SysGroupFund>().eq("group_id",id));
+        int memberNum = userRoleService.count(new QueryWrapper<SysUserRole>().eq("group_id",groupid));
+        SysGroupFund groupFund = groupFundService.getOne(new QueryWrapper<SysGroupFund>().eq("group_id",groupid));
 
         result.put("name",group.getGroupName());
         result.put("memberNum", memberNum);

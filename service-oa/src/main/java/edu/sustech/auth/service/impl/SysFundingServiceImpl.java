@@ -12,7 +12,7 @@ public class SysFundingServiceImpl extends ServiceImpl<SysFundingMapper, SysFund
 
         @Override
         public SysFunding getByFundingId(Long fundingId) {
-            return this.getOne(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<SysFunding>().eq(SysFunding::getFundingId,fundingId));
+            return this.getOne(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<SysFunding>().eq(SysFunding::getId,fundingId));
         }
 
 }

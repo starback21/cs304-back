@@ -40,7 +40,7 @@ public class SysFundingController {
         for(SysFunding sysFunding:sysFundings){
             PageFund pageFund = new PageFund();
             pageFund.setKey(sysFunding.getId());
-            pageFund.setId(sysFunding.getFundingId());
+            pageFund.setId(sysFunding.getId());
             pageFund.setName(sysFunding.getFundingName());
             pageFund.setTotalNum(sysFunding.getTotalAmount());
             pageFund.setLeftNum(sysFunding.getRemainAmount());
@@ -132,7 +132,7 @@ public class SysFundingController {
         List<SysFunding>sysFunding= sysFundingService.list();
         SysFunding sysFunding1 = null;
         for(SysFunding sysFunding2:sysFunding){
-            if(sysFunding2.getFundingId().toString().equals(fundId)){
+            if(sysFunding2.getId().toString().equals(fundId)){
                 sysFunding1 = sysFunding2;
                 break;
             }
@@ -185,7 +185,7 @@ public class SysFundingController {
         List<SysFunding>sysFunding= sysFundingService.list();
         SysFunding sysFunding1 = null;
         for(SysFunding sysFunding2:sysFunding){
-            if(sysFunding2.getFundingId().toString().equals(fundId)){
+            if(sysFunding2.getId().toString().equals(fundId)){
                 sysFunding1 = sysFunding2;
                 break;
             }
@@ -240,7 +240,7 @@ public class SysFundingController {
         String sysFundingname="";
         String sysGroupId="";
         for(SysFunding sysFunding:sysFundings){
-            if(sysFunding.getFundingId().toString().equals(fundId)){
+            if(sysFunding.getId().toString().equals(fundId)){
                 sysFundingname=sysFunding.getFundingName();
                 break;
             }
@@ -333,7 +333,7 @@ public class SysFundingController {
         List<SysFunding>SysFundings = sysFundingService.list();
         SysFunding sysFunding = null;
         for(SysFunding sysFunding1:SysFundings){
-            if(sysFunding1.getFundingId().toString().equals(fundingId)){
+            if(sysFunding1.getId().toString().equals(fundingId)){
                 sysFunding = sysFunding1;
                 break;
             }
