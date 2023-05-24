@@ -1,5 +1,6 @@
 package edu.sustech.auth.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import edu.sustech.auth.service.*;
 import edu.sustech.auth.service.SysUserRoleService;
 import edu.sustech.common.result.Result;
@@ -39,7 +40,7 @@ public class SysFundingController {
         for(SysFunding sysFunding:sysFundings){
             PageFund pageFund = new PageFund();
             pageFund.setKey(sysFunding.getId());
-            pageFund.setId(sysFunding.getFundingId());
+            pageFund.setId(sysFunding.getId());
             pageFund.setName(sysFunding.getFundingName());
             pageFund.setTotalNum(sysFunding.getTotalAmount());
             pageFund.setLeftNum(sysFunding.getRemainAmount());
@@ -131,7 +132,7 @@ public class SysFundingController {
         List<SysFunding>sysFunding= sysFundingService.list();
         SysFunding sysFunding1 = null;
         for(SysFunding sysFunding2:sysFunding){
-            if(sysFunding2.getFundingId().toString().equals(fundId)){
+            if(sysFunding2.getId().toString().equals(fundId)){
                 sysFunding1 = sysFunding2;
                 break;
             }
@@ -148,6 +149,7 @@ public class SysFundingController {
                 break;
             }
         }
+        sysGroupFundDetailService.remove(new QueryWrapper<SysGroupFundDetail>().eq("group_id",groupId).eq("funding_id",fundId));
         sysGroupFunds= sysGroupFundService.list();
         List<PageGroupFund>result = new ArrayList<>();
         for(SysGroupFund sysGroupFund:sysGroupFunds){
@@ -183,7 +185,7 @@ public class SysFundingController {
         List<SysFunding>sysFunding= sysFundingService.list();
         SysFunding sysFunding1 = null;
         for(SysFunding sysFunding2:sysFunding){
-            if(sysFunding2.getFundingId().toString().equals(fundId)){
+            if(sysFunding2.getId().toString().equals(fundId)){
                 sysFunding1 = sysFunding2;
                 break;
             }
@@ -200,6 +202,8 @@ public class SysFundingController {
                 break;
             }
         }
+        Long groupId = sysGroupService.getOne(new QueryWrapper<SysGroup>().eq("group_name",groupName)).getId();
+        sysGroupFundDetailService.remove(new QueryWrapper<SysGroupFundDetail>().eq("group_id",groupId).eq("funding_id",fundId));
         sysGroupFunds= sysGroupFundService.list();
         List<PageGroupFund>result = new ArrayList<>();
         for(SysGroupFund sysGroupFund:sysGroupFunds){
@@ -236,7 +240,7 @@ public class SysFundingController {
         String sysFundingname="";
         String sysGroupId="";
         for(SysFunding sysFunding:sysFundings){
-            if(sysFunding.getFundingId().toString().equals(fundId)){
+            if(sysFunding.getId().toString().equals(fundId)){
                 sysFundingname=sysFunding.getFundingName();
                 break;
             }
@@ -308,7 +312,7 @@ public class SysFundingController {
                 map.put("category2",sysGroupFundDetail.getCategory2());
                 map.put("total",sysGroupFundDetail.getTotalAmount().toString());
                 map.put("cost",sysGroupFundDetail.getUsedAmount().toString());
-                map.put("left", String.valueOf(sysGroupFundDetail.getTotalAmount()-sysGroupFundDetail.getUsedAmount()));
+                map.put("left", sysGroupFundDetail.getRemainAmount().toString());
                 map.put("new","False");
                 result.add(map);
             }
@@ -329,7 +333,7 @@ public class SysFundingController {
         List<SysFunding>SysFundings = sysFundingService.list();
         SysFunding sysFunding = null;
         for(SysFunding sysFunding1:SysFundings){
-            if(sysFunding1.getFundingId().toString().equals(fundingId)){
+            if(sysFunding1.getId().toString().equals(fundingId)){
                 sysFunding = sysFunding1;
                 break;
             }
@@ -363,6 +367,8 @@ public class SysFundingController {
                 sysGroupFundDetail.setCategory1(category1);
                 sysGroupFundDetail.setCategory2(category2);
                 sysGroupFundDetail.setTotalAmount((long) Integer.parseInt(total));
+                sysGroupFundDetail.setUsedAmount(0L);
+                sysGroupFundDetail.setRemainAmount((long) Integer.parseInt(total));
                 sysGroupFundDetailService.save(sysGroupFundDetail);
                 sum=sum+(long) Integer.parseInt(total);
             }
@@ -373,12 +379,24 @@ public class SysFundingController {
                 sum1=sum1-sysGroupFundDetail.getTotalAmount();
                 sum=sum+sum1;
                 sysGroupFundDetail.setTotalAmount((long) Integer.parseInt(total));
+                sysGroupFundDetail.setRemainAmount((long) Integer.parseInt(total)-sysGroupFundDetail.getUsedAmount());
+                sysGroupFundDetail.setCategory1(category1);
+                sysGroupFundDetail.setCategory2(category2);
+                sysGroupFundDetail.setUsedAmount(Long.valueOf(cost));
+                sysGroupFundDetail.setRemainAmount((long) (Integer.parseInt(total)-Integer.parseInt(cost)));
                 sysGroupFundDetailService.updateById(sysGroupFundDetail);
+            }
+        }
+        if(count<sysGroupFundDetails1.size()){
+            for(int i=(int)count;i<sysGroupFundDetails1.size();i++){
+                SysGroupFundDetail sysGroupFundDetail=sysGroupFundDetails1.get(i);
+                sysGroupFundDetailService.removeById(sysGroupFundDetail.getId());
+                sum=sum-sysGroupFundDetail.getTotalAmount();
             }
         }
         assert sysGroupFund != null;
         sysGroupFund.setTotalAmount(sysGroupFund.getTotalAmount()+sum);
-        sysGroupFund.setCost(sysGroupFund.getCost()+sum);
+        sysGroupFund.setCost(sysGroupFund.getCost());
         sysGroupFund.setRemainAmount(sysGroupFund.getTotalAmount()-sysGroupFund.getCost());
         sysGroupFundService.updateById(sysGroupFund);
         assert sysFunding != null;

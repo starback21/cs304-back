@@ -21,6 +21,9 @@ public class SysGroupFundDetail extends BaseEntity{
     @ApiModelProperty(value = "已使用金额")
     @TableField("used_amount")
     private Long usedAmount;
+    @ApiModelProperty(value = "剩余金额")
+    @TableField("remain_amount")
+    private Long remainAmount;
     @ApiModelProperty(value = "经费描述1级")
     @TableField("category1")
     private String category1;

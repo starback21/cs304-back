@@ -7,6 +7,9 @@ import edu.sustech.auth.service.SysFundAppService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.sustech.model.system.SysFundApp;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
 @Service
 public class SysFundAppServiceImpl extends ServiceImpl<SysFundAppMapper, SysFundApp> implements SysFundAppService{
 
@@ -15,5 +18,9 @@ public class SysFundAppServiceImpl extends ServiceImpl<SysFundAppMapper, SysFund
             return this.getOne(new LambdaQueryWrapper<SysFundApp>().eq(SysFundApp::getAppId,appId));
         }
 
+    @Override
+    public List<SysFundApp> getByFundName(String fundName) {
+        return this.list(new LambdaQueryWrapper<SysFundApp>().eq(SysFundApp::getFundName,fundName));
+    }
 
 }

@@ -30,9 +30,15 @@ public class UserController {
     @Autowired
     SysUserService userService;
     @Autowired
-    private SysUserRoleService sysUserRoleService;
+    SysFundAppService fundAppService;
     @Autowired
-    private SysGroupFundService groupFundService;
+    SysFundingService fundingService;
+    @Autowired
+    SysGroupFundDetailService groupFundDetailService;
+    @Autowired
+    SysGroupFundService groupFundService;
+    @Autowired
+    private SysUserRoleService sysUserRoleService;
 
     @ApiOperation(value = "删除申请")
     @PostMapping("/cancelApplication")

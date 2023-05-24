@@ -20,7 +20,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.*;
 
 /**
@@ -104,24 +105,35 @@ public class SysApplicationController {
         boolean is_success = service.update(wrapper);
         SysApplication app = service.getById(id);
         Long groupId = app.getGroupId();
+        System.out.println(id);
         SysFundApp fundApp = fundAppService.getByAppId(id);
-        SysGroupFund groupFund = groupFundService.getById(groupId);
+        SysGroupFund groupFund = groupFundService.getByGroupId(groupId);
         SysFunding funding = fundingService.getById(fundApp.getFundId());
-        SysGroupFundDetail groupFundDetail = new SysGroupFundDetail();
-        groupFundDetail.setGroupId(groupId);
-        groupFundDetail.setFundingId(fundApp.getFundId());
-        groupFundDetail.setTotalAmount(Long.valueOf(app.getNumber()));
-        groupFundDetail.setUsedAmount(Long.valueOf(app.getNumber()));
-        groupFundDetail.setCategory1(app.getCategory1());
-        groupFundDetail.setCategory2(app.getCategory2());
-        groupFundDetailService.save(groupFundDetail);
-        groupFund.setTotalAmount(groupFund.getTotalAmount() + Long.valueOf(app.getNumber()));
+        QueryWrapper<SysGroupFundDetail> queryWrapper = new QueryWrapper<>();
+        SysGroupFundDetail sysGroupFundDetail=groupFundDetailService.getByGroupCategory(app.getCategory1(),app.getCategory2(),fundApp.getFundId(), app.getGroupId());
+        if(sysGroupFundDetail!=null){
+            sysGroupFundDetail.setUsedAmount(sysGroupFundDetail.getUsedAmount()+Long.valueOf(app.getNumber()));
+            sysGroupFundDetail.setRemainAmount(sysGroupFundDetail.getTotalAmount()-sysGroupFundDetail.getUsedAmount());
+            groupFundDetailService.updateById(sysGroupFundDetail);
+        }
+
+//        groupFundDetail.setGroupId(groupId);
+//        groupFundDetail.setFundingId(fundApp.getFundId());
+//        groupFundDetail.setTotalAmount(Long.valueOf(app.getNumber()));
+//        groupFundDetail.setUsedAmount(Long.valueOf(app.getNumber()));
+//        groupFundDetail.setCategory1(app.getCategory1());
+//        groupFundDetail.setCategory2(app.getCategory2());
+//        groupFundDetailService.save(groupFundDetail);
+//        groupFund.setTotalAmount(groupFund.getTotalAmount() + Long.valueOf(app.getNumber()));
+//        groupFund.setCost(groupFund.getCost() + Long.valueOf(app.getNumber()));
+//        groupFund.setRemainAmount(groupFund.getTotalAmount() - groupFund.getCost());
+//        groupFundService.updateById(groupFund);
+//        funding.setCost(funding.getCost() + Long.valueOf(app.getNumber()));
+//        funding.setRemainAmount(funding.getTotalAmount() - funding.getCost());
+//        fundingService.updateById(funding);
         groupFund.setCost(groupFund.getCost() + Long.valueOf(app.getNumber()));
         groupFund.setRemainAmount(groupFund.getTotalAmount() - groupFund.getCost());
         groupFundService.updateById(groupFund);
-        funding.setCost(funding.getCost() + Long.valueOf(app.getNumber()));
-        funding.setRemainAmount(funding.getTotalAmount() - funding.getCost());
-        fundingService.updateById(funding);
         if (is_success)
             return Result.ok();
         else
@@ -140,7 +152,9 @@ public class SysApplicationController {
         for (Long id : idList){
             wrapper.eq("id",id).set("state","reject").set("change_time",date);
             is_success = service.update(wrapper);
+
         }
+
         if (is_success)
             return Result.ok();
         else
@@ -184,6 +198,51 @@ public class SysApplicationController {
 
         return  Result.ok(result);
     }
+    @ApiOperation(value="根据经费名获取所有申请")
+    @GetMapping("/getApplicationsByFundName")
+    public Result<List<Map<Object,Object>>> getApplicationsByFundName(@RequestParam(value = "fundName") String fundName){
+        List<SysFundApp> fundApps = fundAppService.getByFundName(fundName);
+        List<Map<Object,Object>> result = new ArrayList<>();
+        for(SysFundApp fundApp:fundApps){
+            Map<Object,Object> map = new HashMap<>();
+            SysApplication application = service.getById(fundApp.getAppId());
+            if(application.getState().equals("completed")){
+                Date changeTime = application.getChangeTime();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+                String applicationChangeTime = dateFormat.format(changeTime);;
+                System.out.println("申请时间"+applicationChangeTime);
+                if(result.size()==0){
+                    map.put("changeTime",applicationChangeTime);
+                    map.put("number",application.getNumber());
+                    result.add(map);
+                }else{
+                    boolean isExist = false;
+                    for (Map<Object, Object> objectObjectMap : result) {
+                        String resultChangeTime = (String) objectObjectMap.get("changeTime");
+                        if (applicationChangeTime.equals(resultChangeTime)) {
+                            objectObjectMap.put("number", Long.parseLong(objectObjectMap.get("number").toString()) + Long.valueOf(application.getNumber()));
+                            objectObjectMap.put("changeTime", applicationChangeTime);
+                            isExist= true;
+                            break;
+                        }
+                    }
+                    if (!isExist) {
+                        map.put("changeTime", applicationChangeTime);
+                        map.put("number", application.getNumber());
+                        result.add(map);
+                    }
+                }
+            }
+        }
+        result.sort(new Comparator<Map<Object, Object>>() {
+            @Override
+            public int compare(Map<Object, Object> o1, Map<Object, Object> o2) {
+                return o1.get("changeTime").toString().compareTo(o2.get("changeTime").toString());
+            }
+        });
+        return Result.ok(result);
+    }
+
 
 }
 
