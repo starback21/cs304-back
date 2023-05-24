@@ -86,7 +86,6 @@ CREATE TABLE `sys_application` (
 drop table if exists sys_funding;
 CREATE TABLE sys_funding (
   id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键id',
-  funding_id INT NOT NULL default 114514 COMMENT '经费id' ,
   funding_name VARCHAR(20) NOT NULL default 'test' COMMENT '经费名称',
   total_amount DECIMAL(10, 2) NOT NULL default '9999999'COMMENT '总经费',
   cost DECIMAL(10, 2) NOT NULL default 0 COMMENT '单次花费',
