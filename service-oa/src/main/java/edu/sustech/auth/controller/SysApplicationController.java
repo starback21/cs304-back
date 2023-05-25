@@ -112,7 +112,7 @@ public class SysApplicationController {
         SysGroupFund groupFund = groupFundService.getByGroupId(groupId);
         SysFunding funding = fundingService.getById(fundApp.getFundId());
         QueryWrapper<SysGroupFundDetail> queryWrapper = new QueryWrapper<>();
-        SysGroupFundDetail sysGroupFundDetail=groupFundDetailService.getByGroupCategory(app.getCategory1(),app.getCategory2(),fundApp.getFundId(), app.getGroupId());
+        SysGroupFundDetail sysGroupFundDetail=groupFundDetailService.getByGroupCategory(app.getCategory1(),fundApp.getFundId(), app.getGroupId());
         if(sysGroupFundDetail!=null){
             sysGroupFundDetail.setUsedAmount(sysGroupFundDetail.getUsedAmount()+Long.valueOf(app.getNumber()));
             sysGroupFundDetail.setRemainAmount(sysGroupFundDetail.getTotalAmount()-sysGroupFundDetail.getUsedAmount());
