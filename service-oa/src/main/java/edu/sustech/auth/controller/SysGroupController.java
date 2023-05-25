@@ -49,8 +49,8 @@ public class SysGroupController {
     private SysGroupService sysGroupService;
     @Autowired
     private SysUserRoleService userRoleService;
-    @Autowired
-    private SysUserService userService;
+//    @Autowired
+//    private SysGroupFundService groupFundService;
     @Autowired
     private SysGroupFundService groupFundService;
 
@@ -128,6 +128,7 @@ public class SysGroupController {
             }
             tempGroup.setId(group.getId());
             tempGroup.setName(group.getGroupName());
+//            List<SysGroupFund> groupFund =
             tempGroup.setCost(1000);
             tempGroup.setTotal(100);
             tempGroup.setLeft(80);
