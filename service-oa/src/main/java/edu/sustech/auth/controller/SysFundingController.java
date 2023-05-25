@@ -428,17 +428,17 @@ public class SysFundingController {
         sysFunding.setCost(sysFunding.getCost()+sum);
         sysFunding.setRemainAmount(sysFunding.getTotalAmount()-sysFunding.getCost());
         sysFundingService.updateById(sysFunding);
-        List<Map<String,String>>result = new ArrayList<>();
+        List<Map<String,Object>>result = new ArrayList<>();
         sysGroupFundDetails = sysGroupFundDetailService.list();
         for(SysGroupFundDetail sysGroupFundDetail:sysGroupFundDetails){
             if(sysGroupFundDetail.getGroupId().equals(sysGroupFund.getGroupId())&&sysGroupFundDetail.getFundingId().toString().equals(fundingId)){
-                Map<String,String>map = new HashMap<>();
-                map.put("category1",sysGroupFundDetail.getCategory1());
-                map.put("category2",sysGroupFundDetail.getCategory2());
-                map.put("total",sysGroupFundDetail.getTotalAmount().toString());
-                map.put("cost",sysGroupFundDetail.getUsedAmount().toString());
-                map.put("left", String.valueOf(sysGroupFundDetail.getTotalAmount()-sysGroupFundDetail.getUsedAmount()));
-                map.put("new","False");
+                Map<String,Object>map = new HashMap<>();
+                map.put("category",sysGroupFundDetail.getCategory1());
+//                map.put("category2",sysGroupFundDetail.getCategory2());
+                map.put("total",sysGroupFundDetail.getTotalAmount());
+                map.put("cost",sysGroupFundDetail.getUsedAmount());
+                map.put("left", sysGroupFundDetail.getTotalAmount()-sysGroupFundDetail.getUsedAmount());
+                map.put("new",false);
                 result.add(map);
             }
         }
