@@ -82,7 +82,7 @@ public class UserController {
         }
         String group = form.get("group");
         String c1 = form.get("category1");
-        String c2 = form.get("category2");
+//        String c2 = form.get("category2");
         if (form.get("number").equals("")){
             throw new SpecialException(201,"没有数字");
         }
@@ -96,7 +96,7 @@ public class UserController {
         application.setGroupId(id);
         application.setNumber(num);
         application.setCategory1(c1);
-        application.setCategory2(c2);
+//        application.setCategory2(c2);
         application.setComment(comment);
         applicationService.save(application);
         //插入经费申请对应表
