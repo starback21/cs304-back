@@ -30,6 +30,7 @@ public class Befor {
     public void addAdmin(){
         SysUser user = userService.getUserByName("admin");
         if (user == null){
+            user = new SysUser();
             user.setName("admin");
             user.setUid(1L);
             String psw = "123456";

@@ -70,7 +70,7 @@ public class UserController {
     @ApiOperation(value = "添加申请")
     @PostMapping("/createApplication")
     public Result save(@RequestBody Map<String,Object> params){
-        Map<String, String> form = (Map<String, String>) params.get("form");
+        Map<String, Object> form = (Map<String, Object>) params.get("form");
 
         System.out.println("params: "+form);
 //        if (form.get("title").equals("")){
@@ -80,16 +80,16 @@ public class UserController {
         if (form.get("group").equals("")){
             throw new SpecialException(201,"没有课题组");
         }
-        String fundName = form.get("fund");
-        String group = form.get("group");
-        String c1 = form.get("category");
+        String fundName = form.get("fund").toString();
+        String group = form.get("group").toString();
+        String c1 = form.get("category").toString();
 //        String c2 = form.get("category2");
-        if (form.get("number").equals("")){
-            throw new SpecialException(201,"没有数字");
-        }
-        String num_str = form.get("number");
-        int num = Integer.parseInt(num_str);
-        String comment = form.get("comment");
+//        if (form.get("number").equals("")){
+//            throw new SpecialException(201,"没有数字");
+//        }
+//        String num_str = form.get("number");
+        int num = (Integer) form.get("number");
+        String comment = form.get("comment").toString();
         SysApplication application = new SysApplication();
         application.setTitle("title");
         application.setGroupName(group);
