@@ -34,10 +34,38 @@ public class SysFundingController {
     private SysUserService sysUserService;
     @ApiOperation(value = "获取所有经费")
     @GetMapping("getFunds")
-    public Result getFunds() {
-        List<SysFunding> sysFundings = sysFundingService.list();
-        List<PageFund>result= new ArrayList<>();
-        for(SysFunding sysFunding:sysFundings){
+    public Result getFunds(@RequestParam(value="id",required = false)Long id){
+        if(id==null){
+           List<SysFunding> sysFundings = sysFundingService.list();
+           List<PageFund>result= new ArrayList<>();
+           for(SysFunding sysFunding:sysFundings){
+               PageFund pageFund = new PageFund();
+               pageFund.setKey(sysFunding.getId());
+               pageFund.setId(sysFunding.getId());
+               pageFund.setName(sysFunding.getFundingName());
+               pageFund.setTotalNum(sysFunding.getTotalAmount());
+               pageFund.setLeftNum(sysFunding.getRemainAmount());
+               Map<Integer,Integer>map = new HashMap<>();
+               int[] dataRange = new int[2];
+               dataRange[0] = 2019;
+               dataRange[1] = 2021;
+               map.put(dataRange[0],dataRange[1]);
+               pageFund.setDataRange(map);
+               if(sysFunding.getTotalAmount()!=0){
+                   pageFund.setPercent((int) (sysFunding.getRemainAmount()*100/sysFunding.getTotalAmount()));
+               }
+               else{
+                   pageFund.setPercent(0);
+               }
+               pageFund.setState(sysFunding.getStatus());
+               pageFund.setLeftDay(100);
+               pageFund.setDisabled(sysFunding.getIsDeleted());
+               result.add(pageFund);
+
+           }
+           return Result.ok(result);
+        }else{
+            SysFunding sysFunding = sysFundingService.getById(id);
             PageFund pageFund = new PageFund();
             pageFund.setKey(sysFunding.getId());
             pageFund.setId(sysFunding.getId());
@@ -59,10 +87,8 @@ public class SysFundingController {
             pageFund.setState(sysFunding.getStatus());
             pageFund.setLeftDay(100);
             pageFund.setDisabled(sysFunding.getIsDeleted());
-            result.add(pageFund);
-
+            return Result.ok(pageFund);
         }
-        return Result.ok(result);
     }
     @ApiOperation(value = "根据经费id获取组")
     @GetMapping("getGroupByFund")
@@ -445,6 +471,7 @@ public class SysFundingController {
     @ApiOperation(value = "根据经费id获取经费使用信息")
     @GetMapping("getGroupFundByFundId")
     private Result getGroupFundByFundId(@RequestParam(value = "fundId") Long fundId){
+        System.out.println("调用获取经费使用信息接口+ "+fundId);
         List<SysGroupFund> sysGroupFunds = sysGroupFundService.getGroupFundByFundId(fundId);
         List<Map<String,String>>result = new ArrayList<>();
         for(SysGroupFund sysGroupFund:sysGroupFunds){

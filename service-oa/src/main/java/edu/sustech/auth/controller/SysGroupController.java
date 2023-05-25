@@ -249,12 +249,29 @@ public class SysGroupController {
     public Result<Map<String,Object>> getGroupStatistics(@RequestParam(value = "groupId") String id){
         Map<String,Object> result = new HashMap<>();
         long groupid = sysGroupService.getIdByName(id);
+        System.out.println("课题组id+"+groupid);
         SysGroup group=sysGroupService.getById(groupid);
         if (group == null){
             throw new SpecialException(201,"课题组为空");
         }
         int memberNum = userRoleService.count(new QueryWrapper<SysUserRole>().eq("group_id",groupid));
-        SysGroupFund groupFund = groupFundService.getOne(new QueryWrapper<SysGroupFund>().eq("group_id",groupid));
+        List<SysGroupFund> groupFunds = groupFundService.list();
+        List<SysGroupFund> groupFundList = new ArrayList<>();
+        SysGroupFund groupFund = new SysGroupFund();
+        for (SysGroupFund fund : groupFunds){
+            if (fund.getGroupId().equals(groupid)){
+                groupFundList.add(fund);
+            }
+        }
+        groupFund.setGroupId(groupid);
+        groupFund.setCost(0L);
+        groupFund.setTotalAmount(0L);
+        groupFund.setRemainAmount(0L);
+        for (SysGroupFund fund : groupFundList){
+            groupFund.setCost(groupFund.getCost()+fund.getCost());
+            groupFund.setTotalAmount(groupFund.getTotalAmount()+fund.getTotalAmount());
+            groupFund.setRemainAmount(groupFund.getRemainAmount()+fund.getRemainAmount());
+        }
 
         result.put("name",group.getGroupName());
         result.put("memberNum", memberNum);
