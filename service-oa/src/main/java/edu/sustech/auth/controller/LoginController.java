@@ -37,10 +37,10 @@ public class LoginController {
         wrapper.eq(SysUser::getName,account);
         SysUser sysUser = userService.getOne(wrapper)   ;
         if(null == sysUser) {
-            throw new SpecialException(201,"用户不存在");
+            return Result.fail(400,"用户名或密码错误");
         }
         if(!MD5.encrypt(password).equals(sysUser.getPassword())) {
-            throw new SpecialException(201,"密码错误");
+            return Result.fail(400,"用户名或密码错误");
         }
 
         Map<String, Object> map = new HashMap<>();

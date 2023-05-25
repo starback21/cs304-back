@@ -96,6 +96,7 @@ public class UserController {
         Long id = groupService.getIdByName(group);
         application.setGroupId(id);
         application.setNumber(num);
+        application.setState("underway");
         application.setCategory1(c1);
 //        application.setCategory2(c2);
         application.setComment(comment);
@@ -103,7 +104,7 @@ public class UserController {
         //插入经费申请对应表
         //获取刚刚插入的app
         QueryWrapper<SysApplication> wrapper = new QueryWrapper<>();
-        wrapper.orderByDesc("create_time");
+        wrapper.orderByDesc("create_time").last("limit 1");
         SysApplication app = applicationService.getOne(wrapper);
         //创建新的对象
         SysFundApp fundApp = new SysFundApp();

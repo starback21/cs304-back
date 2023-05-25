@@ -62,7 +62,12 @@ public class Result<T> {
         return build(data, ResultCodeEnum.FAIL);
     }
     public static<T> Result<T> fail(){
+
         return Result.fail(null);
+    }
+
+    public static<T> Result<T> fail(Integer code,String msg){
+        return build(null,code,msg);
     }
 
     public Result<T> message(String msg){

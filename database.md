@@ -72,7 +72,7 @@ CREATE TABLE `sys_application` (
   `category1` varchar(30) NOT NULL DEFAULT '' COMMENT '类别1',
   `category2` varchar(30) NOT NULL DEFAULT '' COMMENT '类别2',
   `number` int(5) NOT NULL DEFAULT 0 COMMENT '数量',
-  `state` varchar(30) NOT NULL DEFAULT '' COMMENT '状态',
+  `state` varchar(30) NOT NULL DEFAULT 'underway' COMMENT '状态',
   `change_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '完成时间(状态更新的时间)',
   `people` varchar(20) NOT NULL DEFAULT '' COMMENT '处理人',
   `comment` varchar(100) NOT NULL DEFAULT '' COMMENT '评价',
