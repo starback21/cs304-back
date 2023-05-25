@@ -23,4 +23,9 @@ public class SysFundAppServiceImpl extends ServiceImpl<SysFundAppMapper, SysFund
         return this.list(new LambdaQueryWrapper<SysFundApp>().eq(SysFundApp::getFundName,fundName));
     }
 
+    @Override
+    public List<SysFundApp> getByFundId(Long fundId) {
+        return this.list(new LambdaQueryWrapper<SysFundApp>().eq(SysFundApp::getFundId,fundId));
+    }
+
 }

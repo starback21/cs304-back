@@ -11,4 +11,5 @@ import java.util.List;
 public interface SysFundAppService extends IService<SysFundApp>{
     SysFundApp getByAppId(Long appId);
     List<SysFundApp>getByFundName(String fundName);
+    List<SysFundApp>getByFundId(Long fundId);
 }

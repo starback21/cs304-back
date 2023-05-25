@@ -201,9 +201,9 @@ public class SysApplicationController {
         return  Result.ok(result);
     }
     @ApiOperation(value="根据经费名获取最近一个月的申请")
-    @GetMapping("/getApplicationsByFundName")
-    public Result<List<Map<Object,Object>>> getApplicationsByFundName(@RequestParam(value = "fundName") String fundName){
-        List<SysFundApp> fundApps = fundAppService.getByFundName(fundName);
+    @GetMapping("/getApplicationsByFundId")
+    public Result<List<Map<Object,Object>>> getApplicationsByFundName(@RequestParam(value = "fundId") Long fundId){
+        List<SysFundApp> fundApps = fundAppService.getByFundId(fundId);
         List<Map<Object,Object>> result = new ArrayList<>();
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.MONTH, -1);
