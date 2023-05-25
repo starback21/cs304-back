@@ -379,8 +379,8 @@ public class SysFundingController {
         long sum=0;
         long count=0;
         for(Map<Object,Object>map:FUNDDETAIL){
-            String category1 = map.get("category1").toString();
-            String category2 = map.get("category2").toString();
+            String category1 = map.get("category").toString();
+//            String category2 = map.get("category2").toString();
             String total = map.get("total").toString();
             String cost = map.get("cost").toString();
             String left = map.get("left").toString();
@@ -390,7 +390,7 @@ public class SysFundingController {
                 sysGroupFundDetail.setGroupId(sysGroupFund.getGroupId());
                 sysGroupFundDetail.setFundingId((long) Integer.parseInt(fundingId));
                 sysGroupFundDetail.setCategory1(category1);
-                sysGroupFundDetail.setCategory2(category2);
+//                sysGroupFundDetail.setCategory2(category2);
                 sysGroupFundDetail.setTotalAmount((long) Integer.parseInt(total));
                 sysGroupFundDetail.setUsedAmount(0L);
                 sysGroupFundDetail.setRemainAmount((long) Integer.parseInt(total));
@@ -406,7 +406,7 @@ public class SysFundingController {
                 sysGroupFundDetail.setTotalAmount((long) Integer.parseInt(total));
                 sysGroupFundDetail.setRemainAmount((long) Integer.parseInt(total)-sysGroupFundDetail.getUsedAmount());
                 sysGroupFundDetail.setCategory1(category1);
-                sysGroupFundDetail.setCategory2(category2);
+//                sysGroupFundDetail.setCategory2(category2);
                 sysGroupFundDetail.setUsedAmount(Long.valueOf(cost));
                 sysGroupFundDetail.setRemainAmount((long) (Integer.parseInt(total)-Integer.parseInt(cost)));
                 sysGroupFundDetailService.updateById(sysGroupFundDetail);
