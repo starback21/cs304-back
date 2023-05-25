@@ -200,38 +200,49 @@ public class SysApplicationController {
 
         return  Result.ok(result);
     }
-    @ApiOperation(value="根据经费名获取所有申请")
+    @ApiOperation(value="根据经费名获取最近一个月的申请")
     @GetMapping("/getApplicationsByFundName")
     public Result<List<Map<Object,Object>>> getApplicationsByFundName(@RequestParam(value = "fundName") String fundName){
         List<SysFundApp> fundApps = fundAppService.getByFundName(fundName);
         List<Map<Object,Object>> result = new ArrayList<>();
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MONTH, -1);
+        Date oneMonthAgo = cal.getTime();
+        Date today = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        for (Date date = oneMonthAgo; date.before(today); cal.add(Calendar.DATE, 1), date = cal.getTime()) {
+            Map<Object,Object> map = new HashMap<>();
+            map.put("changeTime", dateFormat.format(date));
+            map.put("number", 0);
+            result.add(map);
+        }
         for(SysFundApp fundApp:fundApps){
             Map<Object,Object> map = new HashMap<>();
             SysApplication application = service.getById(fundApp.getAppId());
             if(application.getState().equals("completed")){
                 Date changeTime = application.getChangeTime();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-                String applicationChangeTime = dateFormat.format(changeTime);;
-                System.out.println("申请时间"+applicationChangeTime);
-                if(result.size()==0){
-                    map.put("changeTime",applicationChangeTime);
-                    map.put("number",application.getNumber());
-                    result.add(map);
-                }else{
-                    boolean isExist = false;
-                    for (Map<Object, Object> objectObjectMap : result) {
-                        String resultChangeTime = (String) objectObjectMap.get("changeTime");
-                        if (applicationChangeTime.equals(resultChangeTime)) {
-                            objectObjectMap.put("number", Long.parseLong(objectObjectMap.get("number").toString()) + Long.valueOf(application.getNumber()));
-                            objectObjectMap.put("changeTime", applicationChangeTime);
-                            isExist= true;
-                            break;
-                        }
-                    }
-                    if (!isExist) {
-                        map.put("changeTime", applicationChangeTime);
-                        map.put("number", application.getNumber());
+                if(changeTime.after(oneMonthAgo)){
+                    String applicationChangeTime = dateFormat.format(changeTime);
+                    if(result.size()==0){
+                        map.put("changeTime",applicationChangeTime);
+                        map.put("number",application.getNumber());
                         result.add(map);
+                    }else{
+                        boolean isExist = false;
+                        for (Map<Object, Object> objectObjectMap : result) {
+                            String resultChangeTime = (String) objectObjectMap.get("changeTime");
+                            if (applicationChangeTime.equals(resultChangeTime)) {
+                                objectObjectMap.put("number", Long.parseLong(objectObjectMap.get("number").toString()) + Long.valueOf(application.getNumber()));
+                                objectObjectMap.put("changeTime", applicationChangeTime);
+                                isExist= true;
+                                break;
+                            }
+                        }
+                        if (!isExist) {
+                            map.put("changeTime", applicationChangeTime);
+                            map.put("number", application.getNumber());
+                            result.add(map);
+                        }
                     }
                 }
             }
