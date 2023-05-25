@@ -20,6 +20,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.*;
@@ -237,7 +239,12 @@ public class SysApplicationController {
         result.sort(new Comparator<Map<Object, Object>>() {
             @Override
             public int compare(Map<Object, Object> o1, Map<Object, Object> o2) {
-                return o1.get("changeTime").toString().compareTo(o2.get("changeTime").toString());
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+                try {
+                    return dateFormat.parse((String) o1.get("changeTime")).compareTo(dateFormat.parse((String) o2.get("changeTime")));
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
         return Result.ok(result);
