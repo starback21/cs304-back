@@ -129,6 +129,7 @@ public class SysGroupController {
             tempGroup.setId(group.getId());
             tempGroup.setName(group.getGroupName());
 //            List<SysGroupFund> groupFund =
+            //TODO
             tempGroup.setCost(1000);
             tempGroup.setTotal(100);
             tempGroup.setLeft(80);

@@ -6,7 +6,6 @@ import edu.sustech.auth.service.SysUserRoleService;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.*;
 import edu.sustech.re.system.PageFund;
-import edu.sustech.re.system.PageGroup;
 import edu.sustech.re.system.PageGroupFund;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -318,13 +317,13 @@ public class SysFundingController {
     }
     @ApiOperation(value = "根据经费id和组id获取经费详情")
     @GetMapping ("getFundDetailByGroup")
-    public Result getFundInfoByGroupAndFund(@RequestParam(value ="groupId") String groupId,
+    public Result getFundInfoByGroupAndFund(@RequestParam(value = "groupId") String groupName,
                                             @RequestParam(value ="fundId") String fundingId) {
         List<SysGroupFundDetail> sysGroupFundDetails = sysGroupFundDetailService.list();
         List<SysGroupFund> sysGroupFunds = sysGroupFundService.list();
         SysGroupFund sysGroupFund = null;
         for(SysGroupFund sysGroupFund1:sysGroupFunds){
-            if(sysGroupFund1.getGroupName().equals(groupId)&&sysGroupFund1.getFundingId().toString().equals(fundingId)){
+            if(sysGroupFund1.getGroupName().equals(groupName)&&sysGroupFund1.getFundingId().toString().equals(fundingId)){
                 sysGroupFund = sysGroupFund1;
                 break;
             }
@@ -334,8 +333,8 @@ public class SysFundingController {
             assert sysGroupFund != null;
             if(sysGroupFundDetail.getGroupId().equals(sysGroupFund.getGroupId())&&sysGroupFundDetail.getFundingId().toString().equals(fundingId)){
                 Map<String,String>map = new HashMap<>();
-                map.put("category1",sysGroupFundDetail.getCategory1());
-                map.put("category2",sysGroupFundDetail.getCategory2());
+                map.put("category",sysGroupFundDetail.getCategory1());
+//                map.put("category2",sysGroupFundDetail.getCategory2());
                 map.put("total",sysGroupFundDetail.getTotalAmount().toString());
                 map.put("cost",sysGroupFundDetail.getUsedAmount().toString());
                 map.put("left", sysGroupFundDetail.getRemainAmount().toString());
