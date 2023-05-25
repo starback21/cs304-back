@@ -73,15 +73,16 @@ public class UserController {
         Map<String, String> form = (Map<String, String>) params.get("form");
 
         System.out.println("params: "+form);
-        if (form.get("title").equals("")){
-            throw new SpecialException(201,"没有标题");
-        }
-        String title =  form.get("title");
+//        if (form.get("title").equals("")){
+//            throw new SpecialException(201,"没有标题");
+//        }
+//        String title =  form.get("title");
         if (form.get("group").equals("")){
             throw new SpecialException(201,"没有课题组");
         }
+        String fundName = form.get("fund");
         String group = form.get("group");
-        String c1 = form.get("category1");
+        String c1 = form.get("category");
 //        String c2 = form.get("category2");
         if (form.get("number").equals("")){
             throw new SpecialException(201,"没有数字");
@@ -90,7 +91,7 @@ public class UserController {
         int num = Integer.parseInt(num_str);
         String comment = form.get("comment");
         SysApplication application = new SysApplication();
-        application.setTitle(title);
+        application.setTitle("title");
         application.setGroupName(group);
         Long id = groupService.getIdByName(group);
         application.setGroupId(id);
@@ -109,8 +110,8 @@ public class UserController {
         fundApp.setAppId(app.getId());
         fundApp.setAppName(app.getTitle());
         //获取fundID
-        Long fundId = fundingService.getByName(title).getId();
-        fundApp.setFundName(title);
+        Long fundId = fundingService.getByName(fundName).getId();
+        fundApp.setFundName(fundName);
         fundApp.setFundId(fundId);
         boolean is_success = fundAppService.save(fundApp);
         if (!is_success) return Result.fail();
