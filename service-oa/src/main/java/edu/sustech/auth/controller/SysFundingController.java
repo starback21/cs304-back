@@ -442,9 +442,25 @@ public class SysFundingController {
         System.out.println("result: "+result);
         return Result.ok(result);
     }
-
-
-
+    @ApiOperation(value = "根据经费id获取经费使用信息")
+    @GetMapping("getGroupFundByFundId")
+    private Result getGroupFundByFundId(@RequestParam(value = "fundId") Long fundId){
+        List<SysGroupFund> sysGroupFunds = sysGroupFundService.getGroupFundByFundId(fundId);
+        List<Map<String,String>>result = new ArrayList<>();
+        for(SysGroupFund sysGroupFund:sysGroupFunds){
+            Map<String,String>map = new HashMap<>();
+            map.put("name",sysGroupFund.getGroupName());
+            map.put("value",sysGroupFund.getTotalAmount().toString());
+            result.add(map);
+        }
+        long remainAmount=0;
+        remainAmount=sysFundingService.getById(fundId).getRemainAmount();
+        Map<String,String>map = new HashMap<>();
+        map.put("name","remain");
+        map.put("value", String.valueOf(remainAmount));
+        result.add(map);
+        return Result.ok(result);
+    }
 
 
 }
