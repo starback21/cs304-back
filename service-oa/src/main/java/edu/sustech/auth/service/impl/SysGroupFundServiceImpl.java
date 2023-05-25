@@ -4,10 +4,12 @@ package edu.sustech.auth.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.sustech.auth.mapper.SysGroupFundMapper;
+import edu.sustech.auth.service.SysFundingService;
 import edu.sustech.auth.service.SysGroupFundDetailService;
 import edu.sustech.auth.service.SysGroupFundService;
 import edu.sustech.model.system.SysGroupFund;
 import edu.sustech.model.system.SysGroupFundDetail;
+import edu.sustech.re.user.UserFund;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,8 @@ public class SysGroupFundServiceImpl extends ServiceImpl<SysGroupFundMapper, Sys
 
     @Autowired
     private SysGroupFundDetailService detailService;
+    @Autowired
+    private SysFundingService fundingService;
     @Override
     public SysGroupFund getByGroupId(Long groupId) {
         return this.getOne(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<SysGroupFund>().eq(SysGroupFund::getGroupId,groupId));
@@ -32,13 +36,25 @@ public class SysGroupFundServiceImpl extends ServiceImpl<SysGroupFundMapper, Sys
     }
 
     @Override
-    public List<SysGroupFundDetail> getGroupFundByGId(Long groupId) {
+    public List<UserFund> getGroupFundByGId(Long groupId) {
         LambdaQueryWrapper<SysGroupFundDetail> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysGroupFundDetail::getGroupId,groupId);
-        wrapper.select(SysGroupFundDetail::getCategory1,
-                SysGroupFundDetail::getCategory2,
-                SysGroupFundDetail::getTotalAmount);
-        return detailService.list(wrapper);
+        wrapper.select(
+                SysGroupFundDetail::getRemainAmount,
+                SysGroupFundDetail::getFundingId,
+                SysGroupFundDetail::getCategory1
+              );
+        List<SysGroupFundDetail> list = detailService.list(wrapper);
+        List<UserFund> result = new ArrayList<>();
+        for (SysGroupFundDetail detail : list){
+            UserFund userFund = new UserFund();
+            userFund.setId(detail.getFundingId());
+            userFund.setCategory(detail.getCategory1());
+            userFund.setRemain_amount(Math.toIntExact(detail.getRemainAmount()));
+            userFund.setName(fundingService.getById(detail.getFundingId()).getFundingName());
+            result.add(userFund);
+        }
+        return result;
     }
 
     @Override

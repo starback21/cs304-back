@@ -44,7 +44,7 @@ public class Knife4jConfig {
                 .select()
                 //只显示admin路径下的页面
                 .apis(RequestHandlerSelectors.basePackage("edu.sustech"))
-                .paths(PathSelectors.regex("/admin/.*"))
+                .paths(PathSelectors.regex("/*/.*"))
                 .build()
                 .globalOperationParameters(pars);
         return adminApi;

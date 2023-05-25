@@ -23,7 +23,7 @@ public class SysFundApp extends BaseEntity {
 
     @ApiModelProperty(value = "申请id")
     @TableField("app_id")
-    private int appId;
+    private Long appId;
 
     @ApiModelProperty(value = "申请名")
     @TableField("app_name")

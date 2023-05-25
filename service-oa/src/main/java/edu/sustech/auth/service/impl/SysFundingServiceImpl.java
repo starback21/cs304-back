@@ -1,6 +1,7 @@
 package edu.sustech.auth.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.sustech.auth.mapper.SysFundingMapper;
 import edu.sustech.auth.service.SysFundingService;
@@ -11,8 +12,8 @@ import org.springframework.stereotype.Service;
 public class SysFundingServiceImpl extends ServiceImpl<SysFundingMapper, SysFunding> implements SysFundingService {
 
         @Override
-        public SysFunding getByFundingId(Long fundingId) {
-            return this.getOne(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<SysFunding>().eq(SysFunding::getId,fundingId));
+        public SysFunding getByName(String name) {
+            return this.getOne(new LambdaQueryWrapper<SysFunding>().eq(SysFunding::getFundingName,name));
         }
 
 }

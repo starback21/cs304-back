@@ -11,6 +11,7 @@ import edu.sustech.common.jwt.JwtHelper;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.*;
 import edu.sustech.re.system.PageApplication;
+import edu.sustech.re.user.UserFund;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.models.auth.In;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-@Api(tags = "后台登录管理")
+@Api(tags = "用户信息管理")
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -98,7 +99,22 @@ public class UserController {
         application.setCategory2(c2);
         application.setComment(comment);
         applicationService.save(application);
-        return Result.ok();
+        //插入经费申请对应表
+        //获取刚刚插入的app
+        QueryWrapper<SysApplication> wrapper = new QueryWrapper<>();
+        wrapper.orderByDesc("create_time");
+        SysApplication app = applicationService.getOne(wrapper);
+        //创建新的对象
+        SysFundApp fundApp = new SysFundApp();
+        fundApp.setAppId(app.getId());
+        fundApp.setAppName(app.getTitle());
+        //获取fundID
+        Long fundId = fundingService.getByName(title).getId();
+        fundApp.setFundName(title);
+        fundApp.setFundId(fundId);
+        boolean is_success = fundAppService.save(fundApp);
+        if (!is_success) return Result.fail();
+        else return Result.ok();
     }
 
     @ApiOperation(value = "获取申请")
@@ -199,13 +215,13 @@ public class UserController {
                                 user.put("name",user1.get("userName").toString());
                                 if(user1.get("admin").toString().equals("2"))
                                 {
-                                    List<SysGroupFundDetail> list =
+                                    List<UserFund> list =
                                             groupFundService.getGroupFundByGId(groupId);
                                     user.put("admin","True");
                                     map.put("fund",list);
                                 }
                                 else {
-                                    List<SysGroupFundDetail> list =
+                                    List<UserFund> list =
                                             groupFundService.getGroupFundByGId(groupId);
                                     user.put("admin","False");
                                     map.put("fund",list);
