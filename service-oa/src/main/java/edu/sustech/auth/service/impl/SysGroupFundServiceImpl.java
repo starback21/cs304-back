@@ -64,5 +64,12 @@ public class SysGroupFundServiceImpl extends ServiceImpl<SysGroupFundMapper, Sys
         return this.list(wrapper);
     }
 
+    @Override
+    public List<SysGroupFund> getGroupFundByGroupId(Long groupId) {
+        LambdaQueryWrapper<SysGroupFund> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysGroupFund::getGroupId,groupId);
+        return this.list(wrapper);
+    }
+
 
 }

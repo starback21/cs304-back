@@ -39,7 +39,8 @@ public class SysUserController {
 
     @Autowired
     private SysUserService userService;
-
+    @Autowired
+    private SysGroupFundService groupFundService;
     @Autowired
     private SysFundingService fundingService;
     @Autowired
@@ -70,6 +71,20 @@ public class SysUserController {
             tuser.setEmail(user.getEmail());
             tuser.setPhone(user.getPhone());
             List<PageGroup> groupList = userService.getUserGroup(user.getId());
+            for (PageGroup group : groupList) {
+                List<SysGroupFund> groupFunds = groupFundService.getGroupFundByGroupId(group.getId());
+                long total = 0;
+                long cost=0;
+                long left=0;
+                for (SysGroupFund groupFund : groupFunds) {
+                    total += groupFund.getTotalAmount();
+                    cost += groupFund.getCost();
+                    left += groupFund.getRemainAmount();
+                }
+                group.setTotal((int) total);
+                group.setCost((int) cost);
+                group.setLeft((int) left);
+            }
             tuser.setGroup(groupList);
             users.add(tuser);
             result.put("users",users);
