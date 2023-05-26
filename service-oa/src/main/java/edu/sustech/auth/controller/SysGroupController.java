@@ -128,11 +128,19 @@ public class SysGroupController {
             }
             tempGroup.setId(group.getId());
             tempGroup.setName(group.getGroupName());
-//            List<SysGroupFund> groupFund =
-            //TODO
-            tempGroup.setCost(1000);
-            tempGroup.setTotal(100);
-            tempGroup.setLeft(80);
+            List<SysGroupFund> groupFund = groupFundService.getGroupFundByGroupId(groupid);
+            long cost = 0;
+            long total = 0;
+            long left = 0;
+            for(SysGroupFund fund:groupFund){
+                cost += fund.getCost();
+                total += fund.getTotalAmount();
+                left += fund.getRemainAmount();
+            }
+
+            tempGroup.setCost((int) cost);
+            tempGroup.setTotal((int) total);
+            tempGroup.setLeft((int) left);
             groups.add(tempGroup);
         }else {
             //全部查询
@@ -149,9 +157,19 @@ public class SysGroupController {
                     }
                     tempGroup.setId(group.getId());
                     tempGroup.setName(group.getGroupName());
-                    tempGroup.setCost(1000);
-                    tempGroup.setTotal(100);
-                    tempGroup.setLeft(80);
+                    List<SysGroupFund> groupFund = groupFundService.getGroupFundByGroupId(groupid);
+                    long cost = 0;
+                    long total = 0;
+                    long left = 0;
+                    for(SysGroupFund fund:groupFund){
+                        cost += fund.getCost();
+                        total += fund.getTotalAmount();
+                        left += fund.getRemainAmount();
+                    }
+
+                    tempGroup.setCost((int) cost);
+                    tempGroup.setTotal((int) total);
+                    tempGroup.setLeft((int) left);
                     groups.add(tempGroup);
                 }
             }
