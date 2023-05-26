@@ -11,11 +11,15 @@ import edu.sustech.common.jwt.JwtHelper;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.*;
 import edu.sustech.re.system.PageApplication;
+import edu.sustech.re.system.PageGroup;
 import edu.sustech.re.system.PageMsg;
+import edu.sustech.re.system.PageUser;
 import edu.sustech.re.user.UserFund;
+import edu.sustech.re.user.UserGroup;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.models.auth.In;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -176,7 +180,7 @@ public class UserController {
 
     @ApiOperation(value = "根据用户id获取课题组")
     @GetMapping("getUserGroups")
-    public Result<List<Map<Object,Object>>> getUserGroups(
+    public Result<List<UserGroup>> getUserGroups(
             @RequestHeader("Authorization") String token){
         Long userId = JwtHelper.getUserId(token);
         String userName = JwtHelper.getUsername(token);
@@ -186,73 +190,40 @@ public class UserController {
         QueryWrapper<SysUserRole> roleQueryWrapper = new QueryWrapper<>();
         //获取用户对应的课题组
         roleQueryWrapper.eq("user_id",userId);
-        List<SysUserRole> sysUserRoles = sysUserRoleService.list(roleQueryWrapper);
-        List<Long>groupIds = new ArrayList<>();
-        //循环加入课题组id
-        for(SysUserRole sysUserRole:sysUserRoles){
-            groupIds.add(sysUserRole.getGroupId());
-        }
-        //获取
-        List<Map<Object,Object>> users = new ArrayList<>();
-        for(SysUserRole sysUserRole:sysUserRoles){
-            Map<Object,Object> map = new HashMap<>();
-            map.put("userId",sysUserRole.getUserId());
-            map.put("admin",sysUserRole.getRoleId());
-            map.put("groupId",sysUserRole.getGroupId());
-            map.put("userName",userService.getById(sysUserRole.getUserId()).getName());
-            users.add(map);
-        }
-
-        List<SysGroupFund> sysGroupFunds = groupFundService.list();
-
-        List<Map<Object,Object>>result = new ArrayList<>();
-        Set<Long> set = new HashSet<>();
-        for(Long groupId:groupIds){
-            for(SysGroupFund sysGroupFund:sysGroupFunds){
-                if(sysGroupFund.getGroupId().equals(groupId)){
-                    if (set.contains(groupId)){
-                        for (Map<Object,Object> tempMap : result){
-                            if (tempMap.get("id").equals(groupId)){
-                                tempMap.put("total",(Long)tempMap.get("total")+
-                                       sysGroupFund.getTotalAmount() ) ;
-                                tempMap.put("left",(Long)tempMap.get("left")+
-                                        sysGroupFund.getRemainAmount());
-                            }
-                        }
-                    }else {
-                        set.add(groupId);
-                        Map<Object,Object>map = new HashMap<>();
-                        map.put("id",sysGroupFund.getGroupId());
-                        map.put("name",sysGroupFund.getGroupName());
-                        map.put("total",sysGroupFund.getTotalAmount());
-                        map.put("left",sysGroupFund.getRemainAmount());
-                        Map<String,String>user = new HashMap<>();
-                        for(Map<Object,Object> user1 : users){
-                            if(user1.get("groupId").equals(groupId)){
-                                user.put("name",user1.get("userName").toString());
-                                if(user1.get("admin").toString().equals("2"))
-                                {
-                                    List<UserFund> list =
-                                            groupFundService.getGroupFundByGId(groupId);
-                                    user.put("admin","True");
-                                    map.put("fund",list);
-                                }
-                                else {
-                                    List<UserFund> list =
-                                            groupFundService.getGroupFundByGId(groupId);
-                                    user.put("admin","False");
-                                    map.put("fund",list);
-                                }
-                            }
-                        }
-                        map.put("users",user);
-                        result.add(map);
-                    }
-
-                }
+        List<SysUserRole> roleList = sysUserRoleService.list(roleQueryWrapper);
+        //作为结果返回
+        List<UserGroup> groups = new ArrayList<>();
+        //遍历课题组
+        for (SysUserRole role : roleList) {
+            UserGroup tempGroup = new UserGroup();
+            tempGroup.setIsAdmin(role.getRoleId() == 2);
+            List<PageUser> users = groupService.getGroupMember(role.getGroupId());
+            if (users.size() != 0){
+                tempGroup.setUsers(users);
+            }else {
+                tempGroup.setUsers(null);
             }
+            tempGroup.setId(role.getGroupId());
+            tempGroup.setName(role.getGroupName());
+            List<SysGroupFund> groupFund =
+                    groupFundService.getGroupFundByGroupId(role.getGroupId());
+            long cost = 0;
+            long total = 0;
+            long left = 0;
+            for(SysGroupFund fund:groupFund){
+                cost += fund.getCost();
+                total += fund.getTotalAmount();
+                left += fund.getRemainAmount();
+            }
+            List<UserFund> list =
+                groupFundService.getGroupFundByGId(role.getGroupId());
+            tempGroup.setFund(list);
+            tempGroup.setCost((int) cost);
+            tempGroup.setTotal((int) total);
+            tempGroup.setLeft((int) left);
+            groups.add(tempGroup);
         }
-        return Result.ok(result);
+        return Result.ok(groups);
     }
 
     @ApiOperation("getUserMessages")
