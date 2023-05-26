@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import edu.sustech.auth.service.*;
 
 import edu.sustech.common.handler.SpecialException;
@@ -229,6 +230,8 @@ public class SysUserController {
     ){
         List<SysMessage> messages = messageService.list();
         List<PageMsg> result_list = new ArrayList<>();
+        UpdateWrapper<SysMessage> wrapper = new UpdateWrapper<>();
+
         int index = 0;
         for (SysMessage message : messages){
             index++;
@@ -239,6 +242,7 @@ public class SysUserController {
                 msg.setNewComing(message.getState()==0);
                 msg.setMsg(message.getContent());
                 result_list.add(msg);
+//                wrapper.eq("id",id).set("state","complete").set("change_time",date);
             }
         }
         Map<String,Object> resul = new HashMap<>(2);

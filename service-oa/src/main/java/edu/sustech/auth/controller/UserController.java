@@ -258,18 +258,14 @@ public class UserController {
             @RequestParam(value = "page") int page,
            @RequestParam(value = "type",required = false)String  type
     ){
-
-//        int index = 0;
-//        for (){
-//            index++;
-//            if (index > (page - 1) * 4 && index <= page * 4){
-//
-//            }
-//        }
         Long userId = JwtHelper.getUserId(token);
-        List<SysMessage> messages = messageService.list(
-                new LambdaQueryWrapper<SysMessage>().eq(SysMessage::getUserId,userId)
-        );
+        LambdaQueryWrapper<SysMessage> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysMessage::getUserId,userId);
+        //TODO
+//        if (!type.equals("all")){
+//            if (type.equals(""))
+//        }
+        List<SysMessage> messages = messageService.list(wrapper);
         List<PageMsg> result_list = new ArrayList<>();
         int index = 0;
         for (SysMessage message : messages){
