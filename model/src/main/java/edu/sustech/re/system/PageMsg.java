@@ -9,14 +9,9 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class PageApplication {
-    int id;
-    String key;
-    String name;
-    String state;
-    String group;
-    int num;
-    Long date;
-    String people;
-    String category;
+public class PageMsg {
+    String type;
+    Date date;
+    Boolean newComing;
+    String msg;
 }

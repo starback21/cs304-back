@@ -1,5 +1,6 @@
 package edu.sustech.auth.service;
 
+
 import edu.sustech.model.system.SysGroup;
 
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -27,4 +28,6 @@ public interface SysGroupService extends IService<SysGroup> {
     List<PageUser> getUsersNotInGroup(Long groupId);
 
     Long getIdByName(String name);
+
+    List<PageUser> getGroupMember(Long groupId);
 }

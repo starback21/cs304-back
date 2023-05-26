@@ -9,6 +9,7 @@ import edu.sustech.common.jwt.JwtHelper;
 import edu.sustech.common.result.Result;
 import edu.sustech.common.utils.MD5;
 import edu.sustech.model.system.SysUser;
+import edu.sustech.vo.system.LoginVo;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,28 +30,26 @@ public class LoginController {
     @Autowired
     SysUserService userService;
     @PostMapping("login")
-    public Result login(@RequestBody JSONObject jsonParam) {
-        String account = jsonParam.get("account").toString();
-        String password = jsonParam.get("password").toString();
+    public Result login(@RequestBody LoginVo loginVo) {
+        String account = loginVo.getUsername();
+        String password = loginVo.getPassword();
         LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysUser::getName,account);
         SysUser sysUser = userService.getOne(wrapper)   ;
         if(null == sysUser) {
-            throw new SpecialException(201,"用户不存在");
+            return Result.fail(400,"用户名或密码错误");
         }
         if(!MD5.encrypt(password).equals(sysUser.getPassword())) {
-            throw new SpecialException(201,"密码错误");
+            return Result.fail(400,"用户名或密码错误");
         }
 
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("token", JwtHelper.createToken(sysUser.getId(), sysUser.getUsername()));
-
         Map<String, Object> map = new HashMap<>();
+        map.put("token", JwtHelper.createToken(sysUser.getId(), sysUser.getName()));
         if(Objects.equals(account, "admin")){
-            map.put("token", JwtHelper.createToken(sysUser.getId(), sysUser.getName()));
+//            map.put("token", "qwefqwadf");
             map.put("identity","admin");
         }else {
-            map.put("token", JwtHelper.createToken(sysUser.getId(), sysUser.getName()));
+//            map.put("token", "asdaccas");
             map.put("identity","user");
         }
         return Result.ok(map);
