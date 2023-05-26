@@ -70,38 +70,6 @@ public class SysGroupController {
         }
         return Result.ok(nameList);
     }
-//    @ApiOperation(value = "根据id查询")
-//    @GetMapping("/getGroup")
-//    public Result<PageGroup> get(@RequestParam(value = "id")Long id) {
-//        SysGroup group = sysGroupService.getById(id);
-//        PageGroup tempGroup = new PageGroup();
-//        QueryWrapper<SysUserRole> wrapper = new QueryWrapper<>();
-//        wrapper.eq("group_id",id);
-//        List<SysUserRole> tlist =  userRoleService.list(wrapper);
-//        if (tlist.size() != 0){
-//            List<PageUser> users = new ArrayList<>();
-//            for (SysUserRole t:tlist){
-//                Long userId = t.getUserId();
-//                SysUser user = userService.getById(userId);
-//                PageUser pageUser = new PageUser();
-//                pageUser.setId(userId);
-//                pageUser.setAdmin(t.getRoleId() == 2);
-//                pageUser.setName(user.getName());
-//                users.add(pageUser);
-//            }
-//            tempGroup.setUsers(users);
-//        }else {
-//            tempGroup.setUsers(null);
-//        }
-//
-//        tempGroup.setId(group.getId());
-//        tempGroup.setName(group.getGroupName());
-//        tempGroup.setCost(1000);
-//        tempGroup.setTotal(100);
-//        tempGroup.setLeft(80);
-//
-//        return Result.ok(tempGroup);
-//    }
     @ApiOperation(value = "分页获取课题组数据")
     @GetMapping("/getGroups")
     public Result<Map<String, Object>> getGroups(@RequestParam(value = "page") int page,
