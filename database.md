@@ -91,13 +91,12 @@ CREATE TABLE sys_funding (
   cost DECIMAL(10, 2) NOT NULL default 0 COMMENT '单次花费',
   remain_amount DECIMAL(10, 2) default 9999 NOT NULL COMMENT '剩余经费',
    status  VARCHAR(20) NOT NULL DEFAULT 'complete' COMMENT '状态',
-  `start_time` VARCHAR(20) default '2019' NOT NULL COMMENT '开始时间',
-   end_time VARCHAR(20) NOT NULL default '2021' COMMENT '结束时间',
+  `start_time` date not null default '2019-10-01' NOT NULL COMMENT '开始时间',
+   end_time date NOT NULL default '2019-10-01' COMMENT '结束时间',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:不可用 1:可用）    '
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='经费表';
-
 drop table if exists sys_fund_app;
 CREATE TABLE `sys_fund_app` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
