@@ -158,7 +158,7 @@ public class UserController {
         }
         Map<String, Object> result = new HashMap<>(2);
         result.put("data",data);
-        result.put("total",data.size());
+        result.put("total",list.size());
         return Result.ok(result);
 
     }
