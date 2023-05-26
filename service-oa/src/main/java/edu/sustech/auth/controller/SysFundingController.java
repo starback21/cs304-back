@@ -12,6 +12,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Api(tags = "经费管理接口")
@@ -44,10 +46,11 @@ public class SysFundingController {
                pageFund.setName(sysFunding.getFundingName());
                pageFund.setTotalNum(sysFunding.getTotalAmount());
                pageFund.setLeftNum(sysFunding.getRemainAmount());
-               Map<Integer,Integer>map = new HashMap<>();
-               int[] dataRange = new int[2];
-               dataRange[0] = 2019;
-               dataRange[1] = 2021;
+               Map<String,String>map = new HashMap<>();
+               SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+               String[] dataRange = new String[2];
+               dataRange[0] = dateFormat.format(sysFunding.getStartTime());
+               dataRange[1] = dateFormat.format(sysFunding.getEndTime());
                map.put(dataRange[0],dataRange[1]);
                pageFund.setDataRange(map);
                if(sysFunding.getTotalAmount()!=0){
@@ -57,7 +60,9 @@ public class SysFundingController {
                    pageFund.setPercent(0);
                }
                pageFund.setState(sysFunding.getStatus());
-               pageFund.setLeftDay(100);
+               Date date = new Date(System.currentTimeMillis());
+               long datetime= (sysFunding.getEndTime().getTime()-date.getTime())/(1000*3600*24);
+               pageFund.setLeftDay((int)datetime);
                pageFund.setDisabled(sysFunding.getIsDeleted());
                result.add(pageFund);
 
@@ -71,10 +76,11 @@ public class SysFundingController {
             pageFund.setName(sysFunding.getFundingName());
             pageFund.setTotalNum(sysFunding.getTotalAmount());
             pageFund.setLeftNum(sysFunding.getRemainAmount());
-            Map<Integer,Integer>map = new HashMap<>();
-            int[] dataRange = new int[2];
-            dataRange[0] = 2019;
-            dataRange[1] = 2021;
+            Map<String, String> map = new HashMap<>();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+            String[] dataRange = new String[2];
+            dataRange[0] = dateFormat.format(sysFunding.getStartTime());
+            dataRange[1] = dateFormat.format(sysFunding.getEndTime());
             map.put(dataRange[0],dataRange[1]);
             pageFund.setDataRange(map);
             if(sysFunding.getTotalAmount()!=0){
@@ -84,7 +90,9 @@ public class SysFundingController {
                 pageFund.setPercent(0);
             }
             pageFund.setState(sysFunding.getStatus());
-            pageFund.setLeftDay(100);
+            Date date = new Date(System.currentTimeMillis());
+            long datetime= (sysFunding.getEndTime().getTime()-date.getTime())/(1000*3600*24);
+            pageFund.setLeftDay((int)datetime);
             pageFund.setDisabled(sysFunding.getIsDeleted());
             return Result.ok(pageFund);
         }

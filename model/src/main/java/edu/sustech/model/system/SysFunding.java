@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.sql.Date;
+
 @Data
 @ApiModel(description = "经费表")
 @TableName("sys_funding")
@@ -31,9 +33,9 @@ public class SysFunding extends BaseEntity {
     private String status;
     @ApiModelProperty(value = "开始时间")
     @TableField("start_time")
-    private String startTime;
+    private Date startTime;
     @ApiModelProperty(value = "结束时间")
     @TableField("end_time")
-    private String endTime;
+    private Date endTime;
 
 }
