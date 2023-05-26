@@ -84,7 +84,7 @@ public class SysApplicationController {
                 tmp.setState(a.getState());
                 tmp.setGroup(a.getGroupName());
                 tmp.setNum(a.getNumber());
-                tmp.setDate(a.getCreateTime());
+                tmp.setDate(a.getCreateTime().getTime());
                 tmp.setPeople(a.getPeople());
                 tmp.setCategory(a.getCategory1());
                 data.add(tmp);
