@@ -16,7 +16,7 @@ public class PageApplication {
     String state;
     String group;
     int num;
-    Date date;
+    Long date;
     String people;
     String category;
 }
