@@ -15,7 +15,7 @@ public class PageFund {
     Long key;
     Long id;
     String name;
-    List<String> dataRange;
+    List<Long> dataRange;
     long totalNum;
     long leftNum;
     int percent;

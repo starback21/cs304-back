@@ -46,10 +46,9 @@ public class SysFundingController {
                pageFund.setName(sysFunding.getFundingName());
                pageFund.setTotalNum(sysFunding.getTotalAmount());
                pageFund.setLeftNum(sysFunding.getRemainAmount());
-               SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-               List<String>dataRange = new ArrayList<>();
-               dataRange.add(dateFormat.format(sysFunding.getStartTime()));
-               dataRange.add(dateFormat.format(sysFunding.getEndTime()));
+               List<Long>dataRange = new ArrayList<>();
+               dataRange.add(sysFunding.getStartTime().getTime());
+               dataRange.add(sysFunding.getEndTime().getTime());
                pageFund.setDataRange(dataRange);
                if(sysFunding.getTotalAmount()!=0){
                    pageFund.setPercent((int) (sysFunding.getRemainAmount()*100/sysFunding.getTotalAmount()));
@@ -74,11 +73,9 @@ public class SysFundingController {
             pageFund.setName(sysFunding.getFundingName());
             pageFund.setTotalNum(sysFunding.getTotalAmount());
             pageFund.setLeftNum(sysFunding.getRemainAmount());
-            Map<String, String> map = new HashMap<>();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-            List<String>dataRange = new ArrayList<>();
-            dataRange.add(dateFormat.format(sysFunding.getStartTime()));
-            dataRange.add(dateFormat.format(sysFunding.getEndTime()));
+            List<Long>dataRange = new ArrayList<>();
+            dataRange.add(sysFunding.getStartTime().getTime());
+            dataRange.add(sysFunding.getEndTime().getTime());
             pageFund.setDataRange(dataRange);
             if(sysFunding.getTotalAmount()!=0){
                 pageFund.setPercent((int) (sysFunding.getRemainAmount()*100/sysFunding.getTotalAmount()));
