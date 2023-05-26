@@ -121,6 +121,7 @@ public class UserController {
         SysMessage message = new SysMessage();
         message.setType("审批通知");
         message.setGroupId(groupId);
+        message.setUserId(userId);
         message.setAppId(app.getId());
         message.setContent("新审批: "+group+" "+userId+" "+userName);
         messageService.save(message);
