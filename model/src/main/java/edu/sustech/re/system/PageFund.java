@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -14,7 +15,7 @@ public class PageFund {
     Long key;
     Long id;
     String name;
-    Map<String,String> dataRange;
+    List<String> dataRange;
     long totalNum;
     long leftNum;
     int percent;

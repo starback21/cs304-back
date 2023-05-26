@@ -46,13 +46,11 @@ public class SysFundingController {
                pageFund.setName(sysFunding.getFundingName());
                pageFund.setTotalNum(sysFunding.getTotalAmount());
                pageFund.setLeftNum(sysFunding.getRemainAmount());
-               Map<String,String>map = new HashMap<>();
                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-               String[] dataRange = new String[2];
-               dataRange[0] = dateFormat.format(sysFunding.getStartTime());
-               dataRange[1] = dateFormat.format(sysFunding.getEndTime());
-               map.put(dataRange[0],dataRange[1]);
-               pageFund.setDataRange(map);
+               List<String>dataRange = new ArrayList<>();
+               dataRange.add(dateFormat.format(sysFunding.getStartTime()));
+               dataRange.add(dateFormat.format(sysFunding.getEndTime()));
+               pageFund.setDataRange(dataRange);
                if(sysFunding.getTotalAmount()!=0){
                    pageFund.setPercent((int) (sysFunding.getRemainAmount()*100/sysFunding.getTotalAmount()));
                }
@@ -78,11 +76,10 @@ public class SysFundingController {
             pageFund.setLeftNum(sysFunding.getRemainAmount());
             Map<String, String> map = new HashMap<>();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-            String[] dataRange = new String[2];
-            dataRange[0] = dateFormat.format(sysFunding.getStartTime());
-            dataRange[1] = dateFormat.format(sysFunding.getEndTime());
-            map.put(dataRange[0],dataRange[1]);
-            pageFund.setDataRange(map);
+            List<String>dataRange = new ArrayList<>();
+            dataRange.add(dateFormat.format(sysFunding.getStartTime()));
+            dataRange.add(dateFormat.format(sysFunding.getEndTime()));
+            pageFund.setDataRange(dataRange);
             if(sysFunding.getTotalAmount()!=0){
                 pageFund.setPercent((int) (sysFunding.getRemainAmount()*100/sysFunding.getTotalAmount()));
             }
