@@ -125,7 +125,7 @@ public class SysGroupController {
                     }
                     tempGroup.setId(group.getId());
                     tempGroup.setName(group.getGroupName());
-                    List<SysGroupFund> groupFund = groupFundService.getGroupFundByGroupId(groupid);
+                    List<SysGroupFund> groupFund = groupFundService.getGroupFundByGroupId(group.getId());
                     long cost = 0;
                     long total = 0;
                     long left = 0;
