@@ -59,6 +59,9 @@ public class SysFundingController {
                pageFund.setState(sysFunding.getStatus());
                Date date = new Date(System.currentTimeMillis());
                long datetime= (sysFunding.getEndTime().getTime()-date.getTime())/(1000*3600*24);
+               if(datetime<0){
+                   datetime=0;
+               }
                pageFund.setLeftDay((int)datetime);
                pageFund.setDisabled(sysFunding.getIsDeleted());
                result.add(pageFund);
@@ -86,6 +89,9 @@ public class SysFundingController {
             pageFund.setState(sysFunding.getStatus());
             Date date = new Date(System.currentTimeMillis());
             long datetime= (sysFunding.getEndTime().getTime()-date.getTime())/(1000*3600*24);
+            if(datetime<0){
+                datetime=0;
+            }
             pageFund.setLeftDay((int)datetime);
             pageFund.setDisabled(sysFunding.getIsDeleted());
             return Result.ok(pageFund);
