@@ -87,12 +87,12 @@ drop table if exists sys_funding;
 CREATE TABLE sys_funding (
   id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键id',
   funding_name VARCHAR(20) NOT NULL default 'test' COMMENT '经费名称',
-  total_amount DECIMAL(10, 2) NOT NULL default '9999999'COMMENT '总经费',
+  total_amount DECIMAL(10, 2) NOT NULL default '10000000'COMMENT '总经费',
   cost DECIMAL(10, 2) NOT NULL default 0 COMMENT '单次花费',
-  remain_amount DECIMAL(10, 2) default 9999 NOT NULL COMMENT '剩余经费',
+  remain_amount DECIMAL(10, 2) default '10000000' NOT NULL COMMENT '剩余经费',
    status  VARCHAR(20) NOT NULL DEFAULT 'complete' COMMENT '状态',
   `start_time` date not null default '2019-10-01' NOT NULL COMMENT '开始时间',
-   end_time date NOT NULL default '2019-10-01' COMMENT '结束时间',
+   end_time date NOT NULL default '2024-10-01' COMMENT '结束时间',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:不可用 1:可用）    '
