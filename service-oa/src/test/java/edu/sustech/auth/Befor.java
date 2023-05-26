@@ -105,10 +105,30 @@ public class Befor {
         applicationService.update(wrapper);
 
     }
+    //添加经费
+    @Test
+    public void addFundings(){
+        SysFunding funding = new SysFunding();
+        for(int i = 0;i<10;i++){
+            funding.setFundingName("fund"+i);
+            funding.setCost(0L);
+            funding.setTotalAmount(10000L);
+            funding.setRemainAmount(10000L);
+            fundingService.save(funding);
+        }
+    }
+    //添加组
+    @Test
+    public void addGroup(){
+        SysGroup group = new SysGroup();
+        for (int i = 0;i<10;i++){
+            group.setGroupName("group"+i);
+            groupService.save(group);
+        }
+    }
 
     @Test
     public void test1(){
-
         int memberNum = roleService.count(new QueryWrapper<SysUserRole>().eq("group_id",3));
         System.out.println(memberNum);
     }
