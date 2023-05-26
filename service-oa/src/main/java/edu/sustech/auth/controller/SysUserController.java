@@ -45,6 +45,8 @@ public class SysUserController {
     private SysFundingService fundingService;
     @Autowired
     private SysApplicationService applicationService;
+    @Autowired
+    private SysMessageService messageService;
 
     //用户条件分页查询
     @ApiOperation("用户条件分页查询")
@@ -181,17 +183,17 @@ public class SysUserController {
         List<SysApplication> appList = applicationService.selectAll();
         List<SysFunding> fundingList = fundingService.list();
         Map<String,Integer> map = new HashMap<>();
-        int newApp = 22;
-        int unApp = 10;
-        int newFund = 30;
-        int unFund = 10;
+        int newApp = 0;
+        int unApp = 0;
+        int newFund = 0;
+        int unFund = 0;
         for (SysApplication app : appList){
             if (app.getState().equals("underway")){
                 unApp++;
             }
         }
         for (SysFunding f : fundingList){
-            if (f.getStatus().equals("completed")){
+            if (f.getStatus().equals("complete")){
                 unFund++;
             }else {
                 newFund++;
@@ -225,79 +227,24 @@ public class SysUserController {
     public Result<Map<String ,Object>> getAdminMessages(@RequestParam(value = "page") int page,
                                                         @RequestParam(value = "type",required = false) String type
     ){
-
-//        int index = 0;
-//        for (){
-//            index++;
-//            if (index > (page - 1) * 4 && index <= page * 4){
-//
-//            }
-//        }
+        List<SysMessage> messages = messageService.list();
         List<PageMsg> result_list = new ArrayList<>();
-        PageMsg msg = new PageMsg();
-        msg.setType("系统通知");
-        msg.setDate(new Date());
-        msg.setNewComing(true);
-        msg.setMsg("1test msg api");
-        Map<String,Object> resul = new HashMap<>(2);
-        result_list.add(msg);
-        resul.put("data",result_list);
-        resul.put("total",result_list.size());
-        return Result.ok(resul);
-    }
-
-    @ApiOperation("getUserMessages")
-    @GetMapping("getUserMessages")
-    public Result<Map<String ,Object>> getUserMessages(@RequestParam(value = "page") int page,
-                                                        @RequestParam(value = "type",required = false)String  type
-    ){
-
-//        int index = 0;
-//        for (){
-//            index++;
-//            if (index > (page - 1) * 4 && index <= page * 4){
-//
-//            }
-//        }
-        List<PageMsg> result_list = new ArrayList<>();
-        PageMsg msg = new PageMsg();
-        msg.setType("系统通知");
-        msg.setDate(new Date());
-        msg.setNewComing(true);
-        msg.setMsg("1test msg api");
-        Map<String,Object> resul = new HashMap<>(2);
-        resul.put("data",result_list);
-        resul.put("total",result_list.size());
-        return Result.ok(resul);
-    }
-
-    @ApiOperation(value = "获取管理员主页数据")
-    @GetMapping("/getUserHomeStatistics")
-    public Result<Map<String,Integer>> getUserHomeStatistics(){
-        List<SysApplication> appList = applicationService.selectAll();
-        List<SysFunding> fundingList = fundingService.list();
-        Map<String,Integer> map = new HashMap<>();
-        int newApp = 22;
-        int unApp = 10;
-        int newFund = 30;
-        int unFund = 10;
-        for (SysApplication app : appList){
-            if (app.getState().equals("underway")){
-                unApp++;
+        int index = 0;
+        for (SysMessage message : messages){
+            index++;
+            if (index > (page - 1) * 4 && index <= page * 4){
+                PageMsg msg = new PageMsg();
+                msg.setType(message.getType());
+                msg.setDate(message.getCreateTime());
+                msg.setNewComing(message.getState()==0);
+                msg.setMsg(message.getContent());
+                result_list.add(msg);
             }
         }
-        for (SysFunding f : fundingList){
-            if (f.getStatus().equals("completed")){
-                unFund++;
-            }else {
-                newFund++;
-            }
-        }
-        map.put("recentApplication",newApp);
-        map.put("underwayApplication",unApp);
-        map.put("permittedApplication",newFund);
-        map.put("rejectedApplication",unFund);
-        return Result.ok(map);
+        Map<String,Object> resul = new HashMap<>(2);
+        resul.put("data",result_list);
+        resul.put("total",messages.size());
+        return Result.ok(resul);
     }
 }
 

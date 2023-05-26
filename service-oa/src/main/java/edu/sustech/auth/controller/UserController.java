@@ -11,6 +11,7 @@ import edu.sustech.common.jwt.JwtHelper;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.*;
 import edu.sustech.re.system.PageApplication;
+import edu.sustech.re.system.PageMsg;
 import edu.sustech.re.user.UserFund;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,11 +42,16 @@ public class UserController {
     SysGroupFundService groupFundService;
     @Autowired
     private SysUserRoleService sysUserRoleService;
+    @Autowired
+    private SysMessageService messageService;
 
     @ApiOperation(value = "删除申请")
     @PostMapping("/cancelApplication")
     public Result cancelApplication(@RequestBody JSONObject jsonParam){
         Long id = jsonParam.getLong("id");
+        LambdaQueryWrapper<SysMessage> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysMessage::getAppId,id);
+        messageService.remove(wrapper);
         boolean is_success = applicationService.removeById(id);
         if (is_success)
             return Result.ok();
@@ -70,36 +76,31 @@ public class UserController {
 
     @ApiOperation(value = "添加申请")
     @PostMapping("/createApplication")
-    public Result save(@RequestBody Map<String,Object> params){
-        Map<String, Object> form = (Map<String, Object>) params.get("form");
+    public Result save(@RequestHeader("Authorization") String token,
+                       @RequestBody Map<String,Object> params){
+        //获取token信息
+        Long userId = JwtHelper.getUserId(token);
+        String userName = JwtHelper.getUsername(token);
+        //查询权限
 
-        System.out.println("params: "+form);
-//        if (form.get("title").equals("")){
-//            throw new SpecialException(201,"没有标题");
-//        }
-//        String title =  form.get("title");
+        //获取表单信息
+        Map<String, Object> form = (Map<String, Object>) params.get("form");
         if (form.get("group").equals("")){
-            throw new SpecialException(201,"没有课题组");
+            return Result.fail(400,"缺少课题组");
         }
         String fundName = form.get("fund").toString();
         String group = form.get("group").toString();
         String c1 = form.get("category").toString();
-//        String c2 = form.get("category2");
-//        if (form.get("number").equals("")){
-//            throw new SpecialException(201,"没有数字");
-//        }
-//        String num_str = form.get("number");
         int num = (Integer) form.get("number");
         String comment = form.get("comment").toString();
         SysApplication application = new SysApplication();
         application.setTitle("title");
         application.setGroupName(group);
-        Long id = groupService.getIdByName(group);
-        application.setGroupId(id);
+        Long groupId = groupService.getIdByName(group);
+        application.setGroupId(groupId);
         application.setNumber(num);
         application.setState("underway");
         application.setCategory1(c1);
-//        application.setCategory2(c2);
         application.setComment(comment);
         applicationService.save(application);
         //插入经费申请对应表
@@ -116,6 +117,13 @@ public class UserController {
         fundApp.setFundName(fundName);
         fundApp.setFundId(fundId);
         boolean is_success = fundAppService.save(fundApp);
+        //加入新消息
+        SysMessage message = new SysMessage();
+        message.setType("审批通知");
+        message.setGroupId(groupId);
+        message.setAppId(app.getId());
+        message.setContent("新审批: "+group+" "+userId+" "+userName);
+        messageService.save(message);
         if (!is_success) return Result.fail();
         else return Result.ok();
     }
@@ -166,7 +174,8 @@ public class UserController {
 
     @ApiOperation(value = "根据用户id获取课题组")
     @GetMapping("getUserGroups")
-    public Result<List<Map<Object,Object>>> getUserGroups(@RequestHeader("Authorization") String token){
+    public Result<List<Map<Object,Object>>> getUserGroups(
+            @RequestHeader("Authorization") String token){
         Long userId = JwtHelper.getUserId(token);
         String userName = JwtHelper.getUsername(token);
         QueryWrapper<SysUserRole> roleQueryWrapper = new QueryWrapper<>();
@@ -239,5 +248,86 @@ public class UserController {
             }
         }
         return Result.ok(result);
+    }
+
+    @ApiOperation("getUserMessages")
+    @GetMapping("getUserMessages")
+    public Result<Map<String ,Object>> getUserMessages(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(value = "page") int page,
+           @RequestParam(value = "type",required = false)String  type
+    ){
+
+//        int index = 0;
+//        for (){
+//            index++;
+//            if (index > (page - 1) * 4 && index <= page * 4){
+//
+//            }
+//        }
+        Long userId = JwtHelper.getUserId(token);
+        List<SysMessage> messages = messageService.list(
+                new LambdaQueryWrapper<SysMessage>().eq(SysMessage::getUserId,userId)
+        );
+        List<PageMsg> result_list = new ArrayList<>();
+        int index = 0;
+        for (SysMessage message : messages){
+            index++;
+            if (index > (page - 1) * 4 && index <= page * 4){
+                PageMsg msg = new PageMsg();
+                msg.setType(message.getType());
+                msg.setDate(message.getCreateTime());
+                msg.setNewComing(message.getState()==0);
+                msg.setMsg(message.getContent());
+                result_list.add(msg);
+            }
+        }
+        Map<String,Object> resul = new HashMap<>(2);
+        resul.put("data",result_list);
+        resul.put("total",messages.size());
+        return Result.ok(resul);
+    }
+
+    @ApiOperation(value = "获取用户主页数据")
+    @GetMapping("/getUserHomeStatistics")
+    public Result<Map<String,Integer>> getUserHomeStatistics(@RequestHeader("Authorization") String token){
+        Long userId = JwtHelper.getUserId(token);
+        List<SysUserRole> roles = sysUserRoleService.list(
+                new QueryWrapper<SysUserRole>().eq("user_id",userId)
+        );
+        //TODO
+        int newApp = 0;
+        int unApp = 0;
+        int permit = 0;
+        int reject = 0;
+        //遍历每个组的信息
+        for (SysUserRole r : roles){
+            Long groupId = r.getGroupId();
+            List<SysApplication> appList = applicationService.list(
+                    new QueryWrapper<SysApplication>().eq("group_id",groupId)
+            );
+            for (SysApplication app : appList){
+                if (app.getState().equals("underway")){
+                    unApp++;
+                }
+                switch (app.getState()) {
+                    case "underway":
+                        unApp++;
+                        break;
+                    case "reject":
+                        reject++;
+                        break;
+                    case "complete":
+                        permit++;
+                        break;
+                }
+            }
+        }
+        Map<String,Integer> map = new HashMap<>();
+        map.put("recentApplication",newApp);
+        map.put("underwayApplication",unApp);
+        map.put("permittedApplication",permit);
+        map.put("rejectedApplication",reject);
+        return Result.ok(map);
     }
 }
