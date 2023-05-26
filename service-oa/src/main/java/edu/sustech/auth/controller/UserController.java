@@ -327,4 +327,23 @@ public class UserController {
         map.put("rejectedApplication",reject);
         return Result.ok(map);
     }
+
+    @ApiOperation(value = "获取用户权限数据")
+    @GetMapping("/getIdentity")
+    public Result<Map<String,String>> getIdentity(@RequestHeader("Authorization") String token){
+        Long userId = JwtHelper.getUserId(token);
+        String userName = JwtHelper.getUsername(token);
+        Map<String,String> map = new HashMap<>();
+        if (userName == null){
+            map.put("identity","");
+            return Result.fail(map);
+        }
+        assert userId != null;
+        if (userName.equals("admin")){
+            map.put("identity","admin");
+        }else {
+            map.put("identity","user");
+        }
+        return Result.ok(map);
+    }
 }

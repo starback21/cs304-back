@@ -228,10 +228,23 @@ public class SysUserController {
     public Result<Map<String ,Object>> getAdminMessages(@RequestParam(value = "page") int page,
                                                         @RequestParam(value = "type",required = false) String type
     ){
-        List<SysMessage> messages = messageService.list();
+        List<SysMessage> messages;
+        if (type != null){
+            if (type.equals("old")) {
+                messages = messageService.list(
+                        new LambdaQueryWrapper<SysMessage>().eq(SysMessage::getState, 1)
+                );
+            }
+            else if (type.equals("new")) {
+                messages = messageService.list(
+                        new LambdaQueryWrapper<SysMessage>().eq(SysMessage::getState, 0)
+                );
+            }else messages = messageService.list();
+        }else messages = messageService.list();
+
         List<PageMsg> result_list = new ArrayList<>();
         UpdateWrapper<SysMessage> wrapper = new UpdateWrapper<>();
-
+        //分页
         int index = 0;
         for (SysMessage message : messages){
             index++;
@@ -242,7 +255,10 @@ public class SysUserController {
                 msg.setNewComing(message.getState()==0);
                 msg.setMsg(message.getContent());
                 result_list.add(msg);
-//                wrapper.eq("id",id).set("state","complete").set("change_time",date);
+                if (message.getState() == 0) {
+                    wrapper.eq("id", message.getId()).set("state", 1);
+                    messageService.update(wrapper);
+                }
             }
         }
         Map<String,Object> resul = new HashMap<>(2);
