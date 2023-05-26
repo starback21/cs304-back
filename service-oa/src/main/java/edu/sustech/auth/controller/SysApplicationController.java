@@ -59,19 +59,16 @@ public class SysApplicationController {
                                                        @RequestParam(value = "type",required = false) String type){
 
         List<SysApplication> list;
+        LambdaQueryWrapper<SysApplication> wrapper = new LambdaQueryWrapper<>();
         if (type != null){
-            if (type.equals("all")){
-                list = service.selectAll();
-            } else if (type.equals("underway")) {
-                LambdaQueryWrapper<SysApplication> wrapper = new LambdaQueryWrapper<>();
+           if (type.equals("underway")) {
                 wrapper.eq(SysApplication::getState,"underway");
                 list = service.list(wrapper);
-            } else {
-                list = service.selectAll();
-            }
-        }else {
-            list = service.selectAll();
-        }
+            } else if (type.equals("reject")){
+                wrapper.eq(SysApplication::getState,"reject");
+                list = service.list(wrapper);
+            }else list = service.selectAll();
+        }else list = service.selectAll();
         List<PageApplication> data = new ArrayList<>();
         int index = 0;
         for (SysApplication a : list){

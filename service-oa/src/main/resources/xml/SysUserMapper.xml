@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="edu.sustech.auth.mapper.SysUserMapper">
-    <select id="selectById" resultType="edu.sustech.model.system.SysUser">
-        select *
-        from sys_user
-        where id = #{userId}
-    </select>
+<!--    <select id="selectById" resultType="edu.sustech.model.system.SysUser">-->
+<!--        select *-->
+<!--        from sys_user-->
+<!--        where id = #{userId}-->
+<!--    </select>-->
 
     <select id="selectUid" resultType="Integer">
         select count(uid) from sys_user where uid = #{uid}

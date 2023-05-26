@@ -81,8 +81,9 @@ public class UserController {
         //获取token信息
         Long userId = JwtHelper.getUserId(token);
         String userName = JwtHelper.getUsername(token);
-        //查询权限
-
+        if (userId == null || userName == null){
+            return Result.fail(204,"wrong");
+        }
         //获取表单信息
         Map<String, Object> form = (Map<String, Object>) params.get("form");
         if (form.get("group").equals("")){
@@ -179,6 +180,9 @@ public class UserController {
             @RequestHeader("Authorization") String token){
         Long userId = JwtHelper.getUserId(token);
         String userName = JwtHelper.getUsername(token);
+        if (userId == null || userName == null){
+            return Result.fail(204,"wrong");
+        }
         QueryWrapper<SysUserRole> roleQueryWrapper = new QueryWrapper<>();
         //获取用户对应的课题组
         roleQueryWrapper.eq("user_id",userId);
@@ -289,6 +293,9 @@ public class UserController {
     @GetMapping("/getUserHomeStatistics")
     public Result<Map<String,Integer>> getUserHomeStatistics(@RequestHeader("Authorization") String token){
         Long userId = JwtHelper.getUserId(token);
+        if (userId == null ){
+            return Result.fail(204,"wrong");
+        }
         List<SysUserRole> roles = sysUserRoleService.list(
                 new QueryWrapper<SysUserRole>().eq("user_id",userId)
         );
@@ -325,6 +332,25 @@ public class UserController {
         map.put("underwayApplication",unApp);
         map.put("permittedApplication",permit);
         map.put("rejectedApplication",reject);
+        return Result.ok(map);
+    }
+
+    @ApiOperation(value = "获取用户权限数据")
+    @GetMapping("/getIdentity")
+    public Result<Map<String,String>> getIdentity(@RequestHeader("Authorization") String token){
+        Long userId = JwtHelper.getUserId(token);
+        String userName = JwtHelper.getUsername(token);
+        Map<String,String> map = new HashMap<>();
+        if (userName == null){
+            map.put("identity","");
+            return Result.fail(map);
+        }
+        assert userId != null;
+        if (userName.equals("admin")){
+            map.put("identity","admin");
+        }else {
+            map.put("identity","user");
+        }
         return Result.ok(map);
     }
 }
