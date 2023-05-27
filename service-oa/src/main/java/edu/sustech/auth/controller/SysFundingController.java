@@ -144,7 +144,7 @@ public class SysFundingController {
             else{
                 map.put("complete","False");
             }
-            map.put("fundId",sysGroupFund.getId());
+            map.put("fundId",sysGroupFund.getFundingId());
             map.put("fund",sysGroupFund.getFundingName());
             map.put("total",sysGroupFund.getTotalAmount().toString());
             map.put("cost",sysGroupFund.getCost().toString());
@@ -457,7 +457,7 @@ public class SysFundingController {
     }
     @ApiOperation(value = "根据id获取、经费信息")
     @GetMapping("getFundStatistics")
-    private Result getFundStatistics(@RequestParam(value = "id") int fundId){
+    private Result getFundStatistics(@RequestParam(value = "id") Long fundId){
         System.out.println("调用获取经费信息接口+ "+fundId);
         SysFunding fund = sysFundingService.getById(fundId);
 
