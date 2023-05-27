@@ -240,9 +240,9 @@ public class SysGroupController {
         Map<String,Object> result = new HashMap<>();
         long groupid = sysGroupService.getIdByName(id);
         System.out.println("课题组id+"+groupid);
-        SysGroup group=sysGroupService.getById(groupid);
+        SysGroup group = sysGroupService.getById(groupid);
         if (group == null){
-            throw new SpecialException(201,"课题组为空");
+            return Result.fail(201,"课题组为空");
         }
         int memberNum = userRoleService.count(new QueryWrapper<SysUserRole>().eq("group_id",groupid));
         List<SysGroupFund> groupFunds = groupFundService.list();
