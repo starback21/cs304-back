@@ -324,4 +324,20 @@ public class UserController {
         }
         return Result.ok(map);
     }
+
+    @ApiOperation(value = "根据组名获取经费信息")
+    @GetMapping ("getGroupFundRemain")
+    public Result getFundInfoByGroup(@RequestParam String groupId) {
+        ArrayList<Map<String ,Object>> list = new ArrayList<>();
+        List<SysGroupFund> sysGroupFunds = groupFundService.list(
+                new LambdaQueryWrapper<SysGroupFund>().eq(SysGroupFund::getGroupId,groupId)
+        );
+        for(SysGroupFund sysGroupFund:sysGroupFunds){
+            Map<String,Object > map = new HashMap<>();
+            map.put("fundName",sysGroupFund.getGroupName());
+            map.put("remain",sysGroupFund.getRemainAmount());
+            list.add(map);
+        }
+        return Result.ok(list);
+    }
 }
