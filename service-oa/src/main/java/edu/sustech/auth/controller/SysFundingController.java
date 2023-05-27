@@ -135,17 +135,17 @@ public class SysFundingController {
         List<SysGroupFund> sysGroupFunds = sysGroupFundService.list(
                 new LambdaQueryWrapper<SysGroupFund>().eq(SysGroupFund::getGroupId,groupId)
         );
-        List<Map<String,String>> result = new ArrayList<>();
+        List<Map<String,Object>> result = new ArrayList<>();
         for(SysGroupFund sysGroupFund:sysGroupFunds){
-            Map<String,String > map = new HashMap<>();
+            Map<String,Object > map = new HashMap<>();
             if(sysGroupFund.getStatus().equals("complete")){
                 map.put("complete","True");
             }
             else{
                 map.put("complete","False");
             }
-            map.put("fundId",sysGroupFund.getGroupName());
-            map.put("fund",sysGroupFund.getTotalAmount().toString());
+            map.put("fundId",sysGroupFund.getId());
+            map.put("fund",sysGroupFund.getFundingName());
             map.put("total",sysGroupFund.getTotalAmount().toString());
             map.put("cost",sysGroupFund.getCost().toString());
             map.put("left",sysGroupFund.getRemainAmount().toString());

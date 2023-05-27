@@ -34,7 +34,6 @@ import java.util.*;
  */
 @Api(tags = "用户管理接口")
 @RestController
-//@CrossOrigin
 @RequestMapping("/admin/system/sysUser")
 public class SysUserController {
 
@@ -42,6 +41,8 @@ public class SysUserController {
     private SysUserService userService;
     @Autowired
     private SysGroupFundService groupFundService;
+    @Autowired
+    private SysUserRoleService roleService;
     @Autowired
     private SysFundingService fundingService;
     @Autowired
@@ -171,6 +172,9 @@ public class SysUserController {
         List<Long> idList = JSONObject.parseArray(js, Long.class);
         QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
         wrapper.in("uid",idList);
+        roleService.remove(
+          new LambdaQueryWrapper<SysUserRole>().in(SysUserRole::getUserId,idList)
+        );
         boolean is_success = userService.remove(wrapper);
         if (is_success){
             return Result.ok();

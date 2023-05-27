@@ -5,7 +5,7 @@
         select *
         from sys_user
         where id not in (select user_id
-        from sys_user_role where group_id = #{groupId} and is_deleted = 0) and name != 'admin'
+        from sys_user_role where group_id = #{groupId} and is_deleted = 0) and name != 'admin' and is_deleted = 0
     </select>
 
     <select id="selectGroupIdByName" resultType="Long">
