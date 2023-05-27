@@ -183,6 +183,9 @@ public class SysGroupController {
     @PostMapping("/deleteGroup")
     public Result remove(@RequestBody JSONObject jsonParam) {
         Long id = jsonParam.getLong("id");
+        QueryWrapper<SysUserRole> wrapper = new QueryWrapper<>();
+        wrapper.eq("group_id",id);
+        userRoleService.remove(wrapper);
         boolean is_success = sysGroupService.removeById(id);
         if (is_success){
             return Result.ok();
