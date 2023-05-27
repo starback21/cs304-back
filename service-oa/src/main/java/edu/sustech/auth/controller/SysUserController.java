@@ -118,7 +118,8 @@ public class SysUserController {
         List<String> nameList = new ArrayList<>();
         List<SysUser> userList = userService.list();
         for (SysUser sysUser : userList){
-            nameList.add(sysUser.getName());
+            if (!sysUser.getName().equals("admin"))
+                nameList.add(sysUser.getName());
         }
         return Result.ok(nameList);
     }
