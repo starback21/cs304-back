@@ -59,13 +59,23 @@ public class SysApplicationController {
         List<SysApplication> list;
         LambdaQueryWrapper<SysApplication> wrapper = new LambdaQueryWrapper<>();
         if (type != null){
-           if (type.equals("underway")) {
-                wrapper.eq(SysApplication::getState,"underway");
-                list = service.list(wrapper);
-            } else if (type.equals("reject")){
-                wrapper.eq(SysApplication::getState,"reject");
-                list = service.list(wrapper);
-            }else list = service.selectAll();
+            switch (type) {
+                case "underway":
+                    wrapper.eq(SysApplication::getState, "underway");
+                    list = service.list(wrapper);
+                    break;
+                case "reject":
+                    wrapper.eq(SysApplication::getState, "reject");
+                    list = service.list(wrapper);
+                    break;
+                case "complete":
+                    wrapper.eq(SysApplication::getState, "complete");
+                    list = service.list(wrapper);
+                    break;
+                default:
+                    list = service.selectAll();
+                    break;
+            }
         }else list = service.selectAll();
         List<PageApplication> data = new ArrayList<>();
         int index = 0;
