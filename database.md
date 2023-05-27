@@ -150,6 +150,9 @@ CREATE TABLE sys_message (
   type VARCHAR(20) NOT NULL default '系统消息' COMMENT '消息类型',
   content VARCHAR(250) NOT NULL default 'test' COMMENT '消息内容',
    state  INT NOT NULL DEFAULT 0 COMMENT '状态（0 未读，1 已读）',
+   user_id BIGINT(20) NOT NULL DEFAULT '0' COMMENT '消息发起人id',
+   group_id BIGINT(20) NOT NULL DEFAULT '0' COMMENT '课题组id',
+   `app_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '申请id',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `is_deleted` tinyint(3) NOT NULL DEFAULT '0' COMMENT '删除标记（0:不可用 1:可用）    '
