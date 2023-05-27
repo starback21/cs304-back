@@ -1,5 +1,6 @@
 package edu.sustech.auth.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import edu.sustech.auth.service.*;
 import edu.sustech.auth.service.SysUserRoleService;
@@ -130,29 +131,30 @@ public class SysFundingController {
     @ApiOperation(value = "根据组名获取经费信息")
     @GetMapping ("getFundInfoByGroup")
     public Result getFundInfoByGroup(@RequestParam String groupId) {
-        List<SysGroupFund> sysGroupFunds = sysGroupFundService.list();
-        Map<String,String>result = new HashMap<>();
-        for(SysGroupFund sysGroupFund:sysGroupFunds){
-            if(sysGroupFund.getGroupId().toString().equals(groupId)){
-                if(sysGroupFund.getStatus().equals("complete")){
-                    result.put("complete","True");
-                }
-                else{
-                    result.put("complete","False");
-                }
-                result.put("fundId",sysGroupFund.getGroupName());
-                result.put("fund",sysGroupFund.getTotalAmount().toString());
-                result.put("total",sysGroupFund.getTotalAmount().toString());
-                result.put("cost",sysGroupFund.getCost().toString());
-                result.put("left",sysGroupFund.getRemainAmount().toString());
-                if(sysGroupFund.getTotalAmount()!=0){
-                    result.put("percent",String.valueOf(sysGroupFund.getCost()*100/sysGroupFund.getTotalAmount()));
-                }else{
-                    result.put("percent","100");
-                }
 
-                break;
+        List<SysGroupFund> sysGroupFunds = sysGroupFundService.list(
+                new LambdaQueryWrapper<SysGroupFund>().eq(SysGroupFund::getGroupId,groupId)
+        );
+        List<Map<String,String>> result = new ArrayList<>();
+        for(SysGroupFund sysGroupFund:sysGroupFunds){
+            Map<String,String > map = new HashMap<>();
+            if(sysGroupFund.getStatus().equals("complete")){
+                map.put("complete","True");
             }
+            else{
+                map.put("complete","False");
+            }
+            map.put("fundId",sysGroupFund.getGroupName());
+            map.put("fund",sysGroupFund.getTotalAmount().toString());
+            map.put("total",sysGroupFund.getTotalAmount().toString());
+            map.put("cost",sysGroupFund.getCost().toString());
+            map.put("left",sysGroupFund.getRemainAmount().toString());
+            if(sysGroupFund.getTotalAmount()!=0){
+                map.put("percent",String.valueOf(sysGroupFund.getCost()*100/sysGroupFund.getTotalAmount()));
+            }else{
+                map.put("percent","100");
+            }
+            result.add(map);
         }
         return Result.ok(result);
     }
