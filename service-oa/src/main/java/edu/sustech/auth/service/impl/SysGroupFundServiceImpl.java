@@ -27,7 +27,8 @@ public class SysGroupFundServiceImpl extends ServiceImpl<SysGroupFundMapper, Sys
     private SysFundingService fundingService;
     @Override
     public SysGroupFund getByGroupId(Long groupId) {
-        return this.getOne(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<SysGroupFund>().eq(SysGroupFund::getGroupId,groupId));
+        return this.getOne(new LambdaQueryWrapper<SysGroupFund>()
+                .eq(SysGroupFund::getGroupId,groupId));
     }
 
     @Override
@@ -69,6 +70,13 @@ public class SysGroupFundServiceImpl extends ServiceImpl<SysGroupFundMapper, Sys
         LambdaQueryWrapper<SysGroupFund> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysGroupFund::getGroupId,groupId);
         return this.list(wrapper);
+    }
+
+    @Override
+    public SysGroupFund getByGroupandFund(Long groupId, Long fundId) {
+        return this.getOne(new LambdaQueryWrapper<SysGroupFund>()
+                .eq(SysGroupFund::getGroupId,groupId)
+                .eq(SysGroupFund::getFundingId,fundId));
     }
 
 

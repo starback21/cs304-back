@@ -16,4 +16,6 @@ public interface SysGroupFundService extends IService<SysGroupFund> {
     List<UserFund> getGroupFundByGId(Long groupId);
     List<SysGroupFund> getGroupFundByFundId(Long fundId);
     List<SysGroupFund>getGroupFundByGroupId(Long groupId);
+
+    SysGroupFund getByGroupandFund(Long groupId,Long fundId);
 }

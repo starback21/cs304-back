@@ -113,11 +113,12 @@ public class SysApplicationController {
         SysApplication app = service.getById(id);
         Long groupId = app.getGroupId();
         System.out.println(id);
-        SysFundApp fundApp = fundAppService.getByAppId(id);
-        SysGroupFund groupFund = groupFundService.getByGroupId(groupId);
-//        SysFunding funding = fundingService.getById(fundApp.getFundId());
-//        QueryWrapper<SysGroupFundDetail> queryWrapper = new QueryWrapper<>();
-        SysGroupFundDetail sysGroupFundDetail=groupFundDetailService.getByGroupCategory(app.getCategory1(),fundApp.getFundId(), app.getGroupId());
+        SysFundApp fundApp = fundAppService.
+                getByAppId(id);
+        SysGroupFund groupFund = groupFundService.
+                getByGroupandFund(groupId, fundApp.getFundId());
+        SysGroupFundDetail sysGroupFundDetail=groupFundDetailService.
+                getByGroupCategory(app.getCategory1(),fundApp.getFundId(), app.getGroupId());
         if(sysGroupFundDetail!=null){
             sysGroupFundDetail.setUsedAmount(sysGroupFundDetail.getUsedAmount()+Long.valueOf(app.getNumber()));
             sysGroupFundDetail.setRemainAmount(sysGroupFundDetail.getTotalAmount()-sysGroupFundDetail.getUsedAmount());
@@ -159,7 +160,7 @@ public class SysApplicationController {
         SysApplication app = service.getById(id);
         Long groupId = app.getGroupId();
         Long fundId = fundAppService.getByAppId(id).getFundId();
-        SysGroupFund fund = groupFundService.getByGroupId(groupId);
+        SysGroupFund fund = groupFundService.getByGroupandFund(groupId,fundId);
         Map<String, Object> result = new HashMap<>();
         result.put("applicationId",id);
         result.put("fundId",fundId);
