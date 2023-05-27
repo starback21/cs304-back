@@ -99,7 +99,7 @@ public class UserController {
         int num = (Integer) form.get("number");
         String comment = form.get("comment").toString();
         SysApplication application = new SysApplication();
-        application.setTitle("title");
+        application.setTitle(fundName);
         application.setGroupName(group);
         Long groupId = groupService.getIdByName(group);
         application.setGroupId(groupId);
@@ -128,7 +128,7 @@ public class UserController {
         message.setGroupId(groupId);
         message.setUserId(userId);
         message.setAppId(app.getId());
-        message.setContent("新审批: "+group+" "+userId+" "+userName);
+        message.setContent("新审批: "+group+" "+userId+" "+userName + comment);
         messageService.save(message);
         if (!is_success) return Result.fail();
         else return Result.ok();

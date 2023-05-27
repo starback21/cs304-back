@@ -41,8 +41,6 @@ public class SysApplicationController {
     @Autowired
     private SysApplicationService service;
     @Autowired
-    private SysGroupService groupService;
-    @Autowired
     private SysFundAppService fundAppService;
     @Autowired
     private SysGroupFundService groupFundService;
@@ -147,21 +145,22 @@ public class SysApplicationController {
 
     @ApiOperation(value = "获取申请详细信息")
     @GetMapping("/getApplicationInfo")
-    public Result<Map<String, Object>> getApplicationInfo(@RequestParam(value = "id") int id) {
+    public Result<Map<String, Object>> getApplicationInfo(@RequestParam(value = "id") Long id) {
         SysApplication app = service.getById(id);
         Long groupId = app.getGroupId();
-
+        Long fundId = fundAppService.getByAppId(id).getFundId();
+        SysGroupFund fund = groupFundService.getByGroupId(groupId);
         Map<String, Object> result = new HashMap<>();
         result.put("applicationId",id);
-        result.put("fundId",1);
-        result.put("fundName","fund1");
+        result.put("fundId",fundId);
+        result.put("fundName",fund.getFundingName());
         result.put("groupName",app.getGroupName());
-        result.put("groupTotalFund",100);
-        result.put("groupUsedFund",20);
+        result.put("groupTotalFund",fund.getTotalAmount());
+        result.put("groupUsedFund",fund.getCost());
         result.put("people","xxx");
         result.put("category1",app.getCategory1());
         result.put("category2",app.getCategory2());
-        result.put("useNum",30);
+        result.put("useNum",fund.getCost());
         result.put("summary",app.getComment());
         result.put("comment",app.getComment());
 
