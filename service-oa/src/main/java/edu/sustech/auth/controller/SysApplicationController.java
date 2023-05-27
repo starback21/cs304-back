@@ -171,7 +171,7 @@ public class SysApplicationController {
         result.put("people","xxx");
         result.put("category1",app.getCategory1());
         result.put("category2",app.getCategory2());
-        result.put("useNum",fund.getCost());
+        result.put("useNum",app.getNumber());
         result.put("summary",app.getComment());
         result.put("comment",app.getComment());
 
