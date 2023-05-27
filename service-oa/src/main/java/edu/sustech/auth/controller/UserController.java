@@ -334,8 +334,8 @@ public class UserController {
         );
         for(SysGroupFund sysGroupFund:sysGroupFunds){
             Map<String,Object > map = new HashMap<>();
-            map.put("fundName",sysGroupFund.getGroupName());
-            map.put("remain",sysGroupFund.getRemainAmount());
+            map.put("name",sysGroupFund.getGroupName());
+            map.put("value",sysGroupFund.getRemainAmount());
             list.add(map);
         }
         return Result.ok(list);

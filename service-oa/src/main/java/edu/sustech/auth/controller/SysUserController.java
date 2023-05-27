@@ -134,7 +134,7 @@ public class SysUserController {
         String phone = jsonParam.get("phone").toString();
         SysUser user = new SysUser();
         if (userService.selectNameSame(name)){
-            throw new SpecialException(201,"用户名重复");
+            return Result.fail(201,"用户名重复");
         }
         user.setName(name);
         user.setEmail(mail);
