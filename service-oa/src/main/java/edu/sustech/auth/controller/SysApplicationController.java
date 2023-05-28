@@ -7,13 +7,8 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import edu.sustech.auth.service.SysGroupService;
+import edu.sustech.auth.service.*;
 import edu.sustech.model.system.*;
-import edu.sustech.auth.service.SysGroupFundDetailService;
-import edu.sustech.auth.service.SysGroupFundService;
-import edu.sustech.auth.service.SysFundingService;
-import edu.sustech.auth.service.SysFundAppService;
-import edu.sustech.auth.service.SysApplicationService;
 import edu.sustech.common.result.Result;
 import edu.sustech.re.system.PageApplication;
 import io.swagger.annotations.Api;
@@ -47,7 +42,9 @@ public class SysApplicationController {
     @Autowired
     private SysGroupFundDetailService groupFundDetailService;
     @Autowired
-    private SysFundingService fundingService;
+    private SysMessageService messageService;
+    @Autowired
+    private SysRemessageService remessageService;
 
 
 
@@ -105,16 +102,16 @@ public class SysApplicationController {
     @ApiOperation("通过申请")
     @PostMapping("/permitApplication")
     public Result permitApplication(@RequestBody JSONObject jsonParam){
-        Long id = jsonParam.getLong("id");
+        Long appid = jsonParam.getLong("id");
         UpdateWrapper<SysApplication> wrapper = new UpdateWrapper<>();
         Date date = new Date(System.currentTimeMillis());
-        wrapper.eq("id",id).set("state","complete").set("change_time",date);
+        wrapper.eq("id",appid).set("state","complete").set("change_time",date);
         boolean is_success = service.update(wrapper);
-        SysApplication app = service.getById(id);
+        SysApplication app = service.getById(appid);
         Long groupId = app.getGroupId();
-        System.out.println(id);
+//        System.out.println(id);
         SysFundApp fundApp = fundAppService.
-                getByAppId(id);
+                getByAppId(appid);
         SysGroupFund groupFund = groupFundService.
                 getByGroupandFund(groupId, fundApp.getFundId());
         SysGroupFundDetail sysGroupFundDetail=groupFundDetailService.
@@ -127,6 +124,19 @@ public class SysApplicationController {
         groupFund.setCost(groupFund.getCost() + Long.valueOf(app.getNumber()));
         groupFund.setRemainAmount(groupFund.getTotalAmount() - groupFund.getCost());
         groupFundService.updateById(groupFund);
+        //从message中获取userid
+        SysMessage sysMessage = messageService.getOne(
+                new LambdaQueryWrapper<SysMessage>().eq(SysMessage::getAppId,appid)
+        );
+        //添加message
+        SysRemessage remessage = new SysRemessage();
+        remessage.setAppId(appid);
+        remessage.setType("permit");
+        remessage.setState(0);
+        remessage.setGroupId(groupId);
+        remessage.setUserId(sysMessage.getUserId());
+        remessage.setContent("通过申请");
+        remessageService.save(remessage);
         if (is_success)
             return Result.ok();
         else
@@ -147,7 +157,21 @@ public class SysApplicationController {
             is_success = service.update(wrapper);
 
         }
-
+        //从message中获取userid
+        SysMessage sysMessage = messageService.getOne(
+                new LambdaQueryWrapper<SysMessage>().eq(SysMessage::getAppId,idList.get(0))
+        );
+        SysApplication app = service.getById(idList.get(0));
+        Long groupId = app.getGroupId();
+        //添加message
+        SysRemessage remessage = new SysRemessage();
+        remessage.setAppId(idList.get(0));
+        remessage.setType("reject");
+        remessage.setState(0);
+        remessage.setGroupId(groupId);
+        remessage.setUserId(sysMessage.getUserId());
+        remessage.setContent("拒绝申请");
+        remessageService.save(remessage);
         if (is_success)
             return Result.ok();
         else

@@ -5,25 +5,21 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import edu.sustech.auth.service.*;
 import edu.sustech.common.handler.SpecialException;
 import edu.sustech.common.jwt.JwtHelper;
 import edu.sustech.common.result.Result;
 import edu.sustech.model.system.*;
 import edu.sustech.re.system.PageApplication;
-import edu.sustech.re.system.PageGroup;
 import edu.sustech.re.system.PageMsg;
 import edu.sustech.re.system.PageUser;
 import edu.sustech.re.user.UserFund;
 import edu.sustech.re.user.UserGroup;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Api(tags = "用户信息管理")
@@ -48,6 +44,8 @@ public class UserController {
     private SysUserRoleService sysUserRoleService;
     @Autowired
     private SysMessageService messageService;
+    @Autowired
+    private SysRemessageService remessageService;
 
     @ApiOperation(value = "删除申请")
     @PostMapping("/cancelApplication")
@@ -137,22 +135,33 @@ public class UserController {
     @ApiOperation(value = "获取申请")
     @GetMapping("/getUserApplications")
     public Result<Map<String, Object>> getApplications(@RequestParam(value = "page") int page,
-                                                       @RequestParam(value = "type",required = false) String type){
-
+                                                       @RequestParam(value = "type",required = false) String type,
+                                                       @RequestHeader("Authorization") String token){
+        Long userId = JwtHelper.getUserId(token);
+        String userName = JwtHelper.getUsername(token);
+        if (userId == null || userName == null){
+            return Result.fail(204,"wrong");
+        }
+        QueryWrapper<SysUserRole> roleQueryWrapper = new QueryWrapper<>();
+        //获取用户对应的课题组
+        roleQueryWrapper.eq("user_id",userId);
+        List<SysUserRole> roleList = sysUserRoleService.list(roleQueryWrapper);
+        List<Long > groupIds = new ArrayList<>();
+        for (SysUserRole role : roleList){
+            groupIds.add(role.getGroupId());
+        }
+        LambdaQueryWrapper<SysApplication> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(SysApplication::getGroupId,groupIds);
         List<SysApplication> list;
         if (type != null){
-            if (type.equals("all")){
-                list = applicationService.selectAll();
-            } else if (type.equals("underway")) {
-                LambdaQueryWrapper<SysApplication> wrapper = new LambdaQueryWrapper<>();
+            if (type.equals("underway")) {
                 wrapper.eq(SysApplication::getState,"underway");
-                list = applicationService.list(wrapper);
-            } else {
-                list = applicationService.selectAll();
+
+            } else if (type.equals("reject")){
+                wrapper.eq(SysApplication::getState,"reject");
             }
-        }else {
-            list = applicationService.selectAll();
         }
+        list = applicationService.list(wrapper);
         List<PageApplication> data = new ArrayList<>();
         int index = 0;
         for (SysApplication a : list){
@@ -234,16 +243,17 @@ public class UserController {
            @RequestParam(value = "type",required = false)String  type
     ){
         Long userId = JwtHelper.getUserId(token);
-        LambdaQueryWrapper<SysMessage> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(SysMessage::getUserId,userId);
-        //TODO
-//        if (!type.equals("all")){
-//            if (type.equals(""))
-//        }
-        List<SysMessage> messages = messageService.list(wrapper);
+        LambdaQueryWrapper<SysRemessage> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysRemessage::getUserId,userId);
+        if (type!=null && !type.equals("all")){
+            wrapper.eq(SysRemessage::getType,type);
+        }
+        List<SysRemessage> messages = remessageService.list(wrapper);
         List<PageMsg> result_list = new ArrayList<>();
+        UpdateWrapper<SysRemessage> upwrapper = new UpdateWrapper<>();
         int index = 0;
-        for (SysMessage message : messages){
+        assert messages != null;
+        for (SysRemessage message : messages){
             index++;
             if (index > (page - 1) * 4 && index <= page * 4){
                 PageMsg msg = new PageMsg();
@@ -251,6 +261,10 @@ public class UserController {
                 msg.setDate(message.getCreateTime());
                 msg.setNewComing(message.getState()==0);
                 msg.setMsg(message.getContent());
+                if (message.getState() == 0) {
+                    upwrapper.eq("id", message.getId()).set("state", 1);
+                    remessageService.update(upwrapper);
+                }
                 result_list.add(msg);
             }
         }
@@ -270,11 +284,18 @@ public class UserController {
         List<SysUserRole> roles = sysUserRoleService.list(
                 new QueryWrapper<SysUserRole>().eq("user_id",userId)
         );
-        //TODO
         int newApp = 0;
         int unApp = 0;
         int permit = 0;
         int reject = 0;
+        List<SysRemessage> remessageList = remessageService.list(
+                new LambdaQueryWrapper<SysRemessage>().eq(SysRemessage::getUserId, userId)
+        );
+        if (remessageList != null) {
+            for (SysRemessage re : remessageList){
+                if (re.getState()==0) newApp++;
+            }
+        }
         //遍历每个组的信息
         for (SysUserRole r : roles){
             Long groupId = r.getGroupId();
@@ -282,9 +303,6 @@ public class UserController {
                     new QueryWrapper<SysApplication>().eq("group_id",groupId)
             );
             for (SysApplication app : appList){
-                if (app.getState().equals("underway")){
-                    unApp++;
-                }
                 switch (app.getState()) {
                     case "underway":
                         unApp++;
@@ -327,8 +345,8 @@ public class UserController {
 
     @ApiOperation(value = "根据组名获取经费信息")
     @GetMapping ("getGroupFundRemain")
-    public Result getFundInfoByGroup(@RequestParam String groupId) {
-        ArrayList<Map<String ,Object>> list = new ArrayList<>();
+    public Result<List<Map<String ,Object>>> getFundInfoByGroup(@RequestParam String groupId) {
+        List<Map<String ,Object>> list = new ArrayList<>();
         List<SysGroupFund> sysGroupFunds = groupFundService.list(
                 new LambdaQueryWrapper<SysGroupFund>().eq(SysGroupFund::getGroupId,groupId)
         );
@@ -338,6 +356,16 @@ public class UserController {
             map.put("value",sysGroupFund.getRemainAmount());
             list.add(map);
         }
+        return Result.ok(list);
+    }
+
+    @ApiOperation(value = "获取每一天的申请次数")
+    @GetMapping("getUserAppTimes")
+    public Result getUserAppTimes(
+            @RequestHeader("Authorization") String token
+    ){
+        Long userId = JwtHelper.getUserId(token);
+        List<Map<Object,Object>> list = messageService.getDate(userId);
         return Result.ok(list);
     }
 }
