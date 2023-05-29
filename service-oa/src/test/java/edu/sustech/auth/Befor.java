@@ -9,7 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 @SpringBootTest
@@ -63,7 +65,9 @@ public class Befor {
         for (int i = 0; i < 10; i++) {
             user.setName("test_"+i);
             user.setUid(base+i);
-            user.setPassword("123456");
+            String psw = "123456";
+            String passwordMd5 = MD5.encrypt(psw);
+            user.setPassword(passwordMd5);
             user.setPhone("13888777666");
             user.setEmail("163@qq.com");
             userService.save(user);
@@ -128,8 +132,27 @@ public class Befor {
     }
 
     @Test
-    public void test1(){
-        int memberNum = roleService.count(new QueryWrapper<SysUserRole>().eq("group_id",3));
-        System.out.println(memberNum);
+    public void test1() throws ParseException {
+
+        SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
+        String day = "2023-1-1";
+        Date targerDay = ft.parse(day);
+        //计算今天到1-1的日期差
+        long targetTime = targerDay.getTime();
+        long todaytime = new Date().getTime();
+        long time =Math.abs(todaytime - targetTime);
+        //转换格式
+        long cntday = time/1000/60/60/24;
+        //打印今天
+        String today = ft.format(new Date());
+        System.out.println("今天是"+today);
+        System.out.println("距离"+day+"有"+cntday+"天");
+        //计算cnt之前的日期
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.DAY_OF_MONTH, (int) -1);
+        Date date = c.getTime();
+        System.out.println(1+"天前是"+ft.format(date));
     }
+
+
 }
