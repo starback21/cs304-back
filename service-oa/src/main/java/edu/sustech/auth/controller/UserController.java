@@ -365,54 +365,42 @@ public class UserController {
     @ApiOperation(value = "获取每一天的申请次数")
     @GetMapping("getUserAppTimes")
     public Result getUserAppTimes(
-//            @RequestHeader("Authorization") String token
-            @RequestParam("userid") Long userId
-    ) throws ParseException {
-//        Long userId = JwtHelper.getUserId(token);
+            @RequestHeader("Authorization") String token
+//            @RequestParam("userid") Long userId
+    )  {
+        Long userId = JwtHelper.getUserId(token);
         List<Map<Object,Object>> list = messageService.getDate(userId);
         SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
-        String day = "2023-1-1";
-        Date targerDay = ft.parse(day);
-        //计算今天到1-1的日期差
-        long targetTime = targerDay.getTime();
-        long todaytime = new Date().getTime();
-        long time =Math.abs(todaytime - targetTime);
-        //转换格式
-        long cntday = time/1000/60/60/24;
-        //计算cnt之前的日期
-//        Calendar c = Calendar.getInstance();
-//        c.add(Calendar.DAY_OF_MONTH, (int) -cntday);
-//        Date date = c.getTime();
-//        System.out.println(cntday+"天前是"+ft.format(date));
         String[] judge = new String[list.size()];
-        long[] dayCount = new long[list.size()];
         int in = 0;
         for (Map<Object,Object> item : list){
             System.out.println(item.get("day").toString());
             judge[in] = item.get("day").toString();
-            dayCount[in++] = (long) item.get("num");
         }
-        List<Map<String ,Integer>> result = new ArrayList<>();
-        for (int i = 1; i <= cntday; i++) {
+        for (int i = 1; i < 365; i++) {
             Calendar c = Calendar.getInstance();
-            c.add(Calendar.DAY_OF_MONTH, -i);
+            if (i < 149)
+                c.add(Calendar.DAY_OF_MONTH, -i);
+            else
+                c.add(Calendar.DAY_OF_MONTH, i - 149);
             Date date = c.getTime();
-            Map<String, Integer> map = new HashMap<>(1);
+            Map<Object, Object> map = new HashMap<>(2);
             String today = ft.format(date);
-            int down = 0;
             boolean isContain = false;
             for (String s : judge) {
                 if (s.equals(today)) {
                     isContain = true;
                     break;
                 }
-                down++;
             }
-            if (isContain) map.put(today, (int) dayCount[down]);
-            else map.put(ft.format(date),0);
-            result.add(map);
+            if (!isContain) {
+                map.put("day",today);
+                map.put("num", 0);
+            }
+            if (!map.isEmpty())
+                list.add(map);
         }
-        System.out.println(result);
-        return Result.ok(result);
+
+        return Result.ok(list);
     }
 }

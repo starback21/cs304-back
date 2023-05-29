@@ -149,7 +149,7 @@ public class Befor {
         System.out.println("距离"+day+"有"+cntday+"天");
         //计算cnt之前的日期
         Calendar c = Calendar.getInstance();
-        c.add(Calendar.DAY_OF_MONTH, (int) -1);
+        c.add(Calendar.DAY_OF_MONTH, 0);
         Date date = c.getTime();
         System.out.println(1+"天前是"+ft.format(date));
     }
