@@ -52,7 +52,7 @@ public class SysFundingController {
                dataRange.add(sysFunding.getEndTime().getTime());
                pageFund.setDataRange(dataRange);
                if(sysFunding.getTotalAmount()!=0){
-                   pageFund.setPercent((int) (sysFunding.getRemainAmount()*100/sysFunding.getTotalAmount()));
+                   pageFund.setPercent((int) (sysFunding.getCost()*100/sysFunding.getTotalAmount()));
                }
                else{
                    pageFund.setPercent(0);
