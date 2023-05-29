@@ -11,9 +11,11 @@ import edu.sustech.auth.service.*;
 import edu.sustech.model.system.*;
 import edu.sustech.common.result.Result;
 import edu.sustech.re.system.PageApplication;
+import edu.sustech.vo.system.SysAppQueryVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -51,10 +53,80 @@ public class SysApplicationController {
     @ApiOperation(value = "获取申请")
     @GetMapping("/getApplications")
     public Result<Map<String, Object>> getApplications(@RequestParam(value = "page") int page,
-                                                       @RequestParam(value = "type",required = false) String type){
+                                                       @RequestParam(value = "type",required = false) String type,
+                                                       SysAppQueryVo sysAppQueryVo){
 
         List<SysApplication> list;
+        //封装条件，判断条件值不为空
         LambdaQueryWrapper<SysApplication> wrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<SysFundApp> fundAppWrapper = new LambdaQueryWrapper<>();
+        //获取条件值
+        String fundName = sysAppQueryVo.getFundName();
+        Long fundId = sysAppQueryVo.getFundId();
+        String group = sysAppQueryVo.getGroup();
+        String startDate = sysAppQueryVo.getStartDate();
+        String endDate = sysAppQueryVo.getEndDate();
+        Long startValue = sysAppQueryVo.getStartValue();
+        Long endValue = sysAppQueryVo.getEndValue();
+        String category = sysAppQueryVo.getCategory();
+        String ascend = sysAppQueryVo.getAscend();
+        //判断条件值不为空
+        //like 模糊查询
+
+        if(!StringUtils.isEmpty(group)) {
+            wrapper.like(SysApplication::getGroupName,group);
+        }
+        //ge 大于等于
+        if(!StringUtils.isEmpty(startDate)) {
+            wrapper.ge(SysApplication::getCreateTime,startDate);
+        }
+        //le 小于等于
+        if(!StringUtils.isEmpty(endDate)) {
+            wrapper.le(SysApplication::getCreateTime,endDate);
+        }
+        //ge 大于等于
+        if(!StringUtils.isEmpty(startValue)) {
+            wrapper.ge(SysApplication::getNumber,startValue);
+        }
+        //le 小于等于
+        if(!StringUtils.isEmpty(endValue)) {
+            wrapper.le(SysApplication::getNumber,endValue);
+        }
+        if(!StringUtils.isEmpty(category)) {
+            wrapper.like(SysApplication::getCategory1,category);
+        }
+        //fund
+        boolean should_fund = false;
+        if(!StringUtils.isEmpty(fundName)) {
+            fundAppWrapper.like(SysFundApp::getFundName,fundName);
+            should_fund = true;
+        }
+        if(!StringUtils.isEmpty(fundId)) {
+            fundAppWrapper.eq(SysFundApp::getFundId,fundId);
+            should_fund = true;
+        }
+        List<Long> condition = new ArrayList<>();
+        if (should_fund){
+            List<SysFundApp> list1 = fundAppService.list(fundAppWrapper);
+            for (SysFundApp item : list1){
+                condition.add(item.getAppId());
+            }
+            if (list1.size()!=0)
+                wrapper.in(SysApplication::getId,condition);
+            else {
+                Map<String, Object> hashMap = new HashMap<>();
+                hashMap.put("data",list1);
+                hashMap.put("total",0);
+                return Result.ok(hashMap);
+            }
+
+        }
+        if(!StringUtils.isEmpty(ascend)) {
+            if (ascend.equals("true"))
+                wrapper.orderByAsc(SysApplication::getNumber);
+            else
+                wrapper.orderByDesc();
+        }
         if (type != null){
             switch (type) {
                 case "underway":
@@ -70,10 +142,10 @@ public class SysApplicationController {
                     list = service.list(wrapper);
                     break;
                 default:
-                    list = service.selectAll();
+                    list = service.list(wrapper);
                     break;
             }
-        }else list = service.selectAll();
+        }else list = service.list(wrapper);
         List<PageApplication> data = new ArrayList<>();
         int index = 0;
         for (SysApplication a : list){
