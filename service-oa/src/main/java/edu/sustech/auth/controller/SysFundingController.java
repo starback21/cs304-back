@@ -172,6 +172,7 @@ public class SysFundingController {
                 break;
             }
         }
+        long cost=999;
         for(SysGroupFund sysGroupFund:sysGroupFunds){
             if(sysGroupFund.getGroupId().toString().equals(groupId)&&sysGroupFund.getFundingId().toString().equals(fundId)){
                 if(sysGroupFund.getCost()==0){
@@ -180,11 +181,14 @@ public class SysFundingController {
                     sysFunding1.setRemainAmount(sysFunding1.getRemainAmount()+sysGroupFund.getTotalAmount());
                     sysFunding1.setCost(sysFunding1.getCost()-sysGroupFund.getTotalAmount());
                     sysFundingService.updateById(sysFunding1);
+                    cost=0;
                 }
                 break;
             }
         }
-        sysGroupFundDetailService.remove(new QueryWrapper<SysGroupFundDetail>().eq("group_id",groupId).eq("funding_id",fundId));
+        if (cost==0){
+            sysGroupFundDetailService.remove(new QueryWrapper<SysGroupFundDetail>().eq("group_id",groupId).eq("funding_id",fundId));
+        }
         sysGroupFunds= sysGroupFundService.list();
         List<PageGroupFund>result = new ArrayList<>();
         for(SysGroupFund sysGroupFund:sysGroupFunds){
@@ -225,6 +229,7 @@ public class SysFundingController {
                 break;
             }
         }
+        long cost=9999;
         for(SysGroupFund sysGroupFund:sysGroupFunds){
             if(sysGroupFund.getGroupName().equals(groupName)&&sysGroupFund.getFundingId().toString().equals(fundId)){
                 if(sysGroupFund.getCost()==0){
@@ -233,12 +238,15 @@ public class SysFundingController {
                     sysFunding1.setRemainAmount(sysFunding1.getRemainAmount()+sysGroupFund.getTotalAmount());
                     sysFunding1.setCost(sysFunding1.getCost()-sysGroupFund.getTotalAmount());
                     sysFundingService.updateById(sysFunding1);
+                    cost=0;
                 }
                 break;
             }
         }
         Long groupId = sysGroupService.getOne(new QueryWrapper<SysGroup>().eq("group_name",groupName)).getId();
-        sysGroupFundDetailService.remove(new QueryWrapper<SysGroupFundDetail>().eq("group_id",groupId).eq("funding_id",fundId));
+        if(cost==0){
+                sysGroupFundDetailService.remove(new QueryWrapper<SysGroupFundDetail>().eq("group_id",groupId).eq("funding_id",fundId));
+        }
         sysGroupFunds= sysGroupFundService.list();
         List<PageGroupFund>result = new ArrayList<>();
         for(SysGroupFund sysGroupFund:sysGroupFunds){
