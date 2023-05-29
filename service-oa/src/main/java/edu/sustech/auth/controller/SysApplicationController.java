@@ -356,6 +356,8 @@ public class SysApplicationController {
                         boolean isExist = false;
                         for (Map<Object, Object> objectObjectMap : result) {
                             String resultChangeTime = (String) objectObjectMap.get("changeTime");
+                            System.out.println(applicationChangeTime);
+                            System.out.println(resultChangeTime);
                             if (applicationChangeTime.equals(resultChangeTime)) {
                                 objectObjectMap.put("number", Long.parseLong(objectObjectMap.get("number").toString()) + Long.valueOf(application.getNumber()));
                                 objectObjectMap.put("changeTime", applicationChangeTime);
