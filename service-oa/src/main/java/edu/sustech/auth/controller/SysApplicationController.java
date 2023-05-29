@@ -344,7 +344,7 @@ public class SysApplicationController {
         for(SysFundApp fundApp:fundApps){
             Map<Object,Object> map = new HashMap<>();
             SysApplication application = service.getById(fundApp.getAppId());
-            if(application.getState().equals("completed")){
+            if(application.getState().equals("complete")){
                 Date changeTime = application.getChangeTime();
                 if(changeTime.after(oneMonthAgo)){
                     String applicationChangeTime = dateFormat.format(changeTime);
