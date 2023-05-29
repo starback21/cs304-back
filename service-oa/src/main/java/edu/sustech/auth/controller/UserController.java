@@ -354,8 +354,9 @@ public class UserController {
                 new LambdaQueryWrapper<SysGroupFund>().eq(SysGroupFund::getGroupId,groupId)
         );
         for(SysGroupFund sysGroupFund:sysGroupFunds){
+            SysFunding fund = fundingService.getById(sysGroupFund.getFundingId());
             Map<String,Object > map = new HashMap<>();
-            map.put("name",sysGroupFund.getGroupName());
+            map.put("name",fund.getFundingName());
             map.put("value",sysGroupFund.getRemainAmount());
             list.add(map);
         }
