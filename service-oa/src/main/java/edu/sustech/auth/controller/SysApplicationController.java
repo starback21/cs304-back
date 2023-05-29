@@ -54,7 +54,7 @@ public class SysApplicationController {
     @GetMapping("/getApplications")
     public Result<Map<String, Object>> getApplications(@RequestParam(value = "page") int page,
                                                        @RequestParam(value = "type",required = false) String type,
-                                                       @RequestParam(value = "pageSize") Long limit,
+                                                       @RequestParam(value = "pageSize",required = false) Long limit,
                                                        SysAppQueryVo sysAppQueryVo){
 
         List<SysApplication> list;
@@ -182,6 +182,9 @@ public class SysApplicationController {
         }else list = service.list(wrapper);
         List<PageApplication> data = new ArrayList<>();
         int index = 0;
+        if (limit==null){
+            limit = 3L;
+        }
         for (SysApplication a : list){
             index++;
             if (index > (page - 1) * limit && index <= page * limit){
