@@ -19,4 +19,5 @@ public class SysAppQueryVo implements Serializable {
     private Long endValue;
     private String category;
     private String ascend;
+    private String sortBy;
 }

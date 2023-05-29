@@ -54,6 +54,7 @@ public class SysApplicationController {
     @GetMapping("/getApplications")
     public Result<Map<String, Object>> getApplications(@RequestParam(value = "page") int page,
                                                        @RequestParam(value = "type",required = false) String type,
+                                                       @RequestParam(value = "pageSize") Long limit,
                                                        SysAppQueryVo sysAppQueryVo){
 
         List<SysApplication> list;
@@ -70,6 +71,7 @@ public class SysApplicationController {
         Long endValue = sysAppQueryVo.getEndValue();
         String category = sysAppQueryVo.getCategory();
         String ascend = sysAppQueryVo.getAscend();
+        String sortBy = sysAppQueryVo.getSortBy();
         //判断条件值不为空
         //like 模糊查询
 
@@ -121,11 +123,43 @@ public class SysApplicationController {
             }
 
         }
+
+
         if(!StringUtils.isEmpty(ascend)) {
-            if (ascend.equals("true"))
-                wrapper.orderByAsc(SysApplication::getNumber);
-            else
-                wrapper.orderByDesc();
+            if(!StringUtils.isEmpty(sortBy)){
+                if (ascend.equals("true"))
+                    switch (sortBy){
+                        case "group":
+                            wrapper.orderByAsc(SysApplication::getGroupName);
+                            break;
+                        case "value":
+                            wrapper.orderByAsc(SysApplication::getNumber);
+                            break;
+                        case "date":
+                            wrapper.orderByAsc(SysApplication::getCreateTime);
+                            break;
+                        case "category":
+                            wrapper.orderByAsc(SysApplication::getCategory1);
+                            break;
+                    }
+                else
+                    switch (sortBy){
+                        case "group":
+                            wrapper.orderByDesc(SysApplication::getGroupName);
+                            break;
+                        case "value":
+                            wrapper.orderByDesc(SysApplication::getNumber);
+                            break;
+                        case "date":
+                            wrapper.orderByDesc(SysApplication::getCreateTime);
+                            break;
+                        case "category":
+                            wrapper.orderByDesc(SysApplication::getCategory1);
+                            break;
+                    }
+
+            }
+
         }
         if (type != null){
             switch (type) {
@@ -150,7 +184,7 @@ public class SysApplicationController {
         int index = 0;
         for (SysApplication a : list){
             index++;
-            if (index > (page - 1) * 3 && index <= page * 3){
+            if (index > (page - 1) * limit && index <= page * limit){
                 PageApplication tmp = new PageApplication();
                 tmp.setId(Math.toIntExact(a.getId()));
                 tmp.setKey(a.getId().toString());
