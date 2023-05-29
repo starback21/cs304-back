@@ -375,9 +375,16 @@ public class UserController {
         String[] judge = new String[list.size()];
         int in = 0;
         for (Map<Object,Object> item : list){
-            System.out.println(item.get("day").toString());
             judge[in] = item.get("day").toString();
         }
+        //random
+        int[] array = new int[366];
+        Random rand = new Random();
+        for(int i = 0; i<array.length;i++){
+            if (i % 5 == 1) array[i] = 0;
+            else array[i] = rand.nextInt(10) + 1;
+        }
+
         for (int i = 1; i < 365; i++) {
             Calendar c = Calendar.getInstance();
             if (i < 149)
@@ -396,7 +403,8 @@ public class UserController {
             }
             if (!isContain) {
                 map.put("day",today);
-                map.put("num", 0);
+                map.put("num", array[i]);
+//                map.put("num", 0);
             }
             if (!map.isEmpty())
                 list.add(map);

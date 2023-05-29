@@ -13,7 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
+import java.util.Random;
 @SpringBootTest
 public class Befor {
 
@@ -154,5 +154,14 @@ public class Befor {
         System.out.println(1+"天前是"+ft.format(date));
     }
 
+    @Test
+    public void addHistory(){
+        int[] array = new int[365];
+        Random rand = new Random();
+        for(int i = 0; i<array.length;i++){
+            if (i % 7 == 1) array[i] = 0;
+            else array[i] = rand.nextInt(3) + 1;
+        }
+    }
 
 }
