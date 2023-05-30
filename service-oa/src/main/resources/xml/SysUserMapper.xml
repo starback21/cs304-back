@@ -12,7 +12,7 @@
     </select>
 
     <select id="selectName" resultType="Integer">
-        select count(name) from sys_user where name = #{name}
+        select count(name) from sys_user where name = #{name} and is_deleted = 0
     </select>
 
     <select id="selectIdByName" resultType="Long">

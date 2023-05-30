@@ -412,4 +412,23 @@ public class UserController {
 
         return Result.ok(list);
     }
+
+    @ApiOperation(value = "获取用户权限数据")
+    @GetMapping("/getUser")
+    public Result<PageUser> getUser(@RequestHeader("Authorization") String token){
+        Long userId = JwtHelper.getUserId(token);
+        String userName = JwtHelper.getUsername(token);
+        if (userName == null){
+            return Result.fail();
+        }
+        assert userId != null;
+        SysUser user = userService.getById(userId);
+        PageUser pageUser = new PageUser();
+        pageUser.setName(userName);
+        pageUser.setId(user.getUid());
+        pageUser.setKey(userId);
+        pageUser.setPhone(user.getPhone());
+        pageUser.setEmail(user.getEmail());
+        return Result.ok(pageUser);
+    }
 }
